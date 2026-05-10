@@ -33,11 +33,14 @@ pnpm install
 ```
 Note : N'installez jamais de dépendances manuellement dans les sous-dossiers avec npm ou yarn. Utilisez toujours pnpm à la racine.
 ## 🚀 Lancement en développement
-Pour lancer simultanément le Frontend et l'API :
+Pour lancer séparément le Frontend et l'API :
 
 ```bash
-pnpm dev
+pnpm dev --filter=@repo/client
+
+pnpm dev --filter=@repo/api
 ```
+Le filtre `@repo/client` correspond au Frontend, tandis que le filtre `@repo/api` correspond à l'API.
 
 * Frontend : http://localhost:3000
 * API : http://localhost:4000
