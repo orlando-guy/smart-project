@@ -1,0 +1,24 @@
+{
+  "name": "smart-project",
+  "version": "1.0.0",
+  "description": "Plateforme web permettant aux étudiants de gérer leurs projets en équipe, suivre les tâches, livrable et feedbacks avec une interface intuitive et collaborative.",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@11.0.9",
+  "engine": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "devDependencies": {
+    "turbo": "^2.9.11"
+  }
+}

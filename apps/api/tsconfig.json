@@ -1,0 +1,16 @@
+{
+    "extends": "@repo/config/typescript/base.json",
+    "compilerOptions": {
+        "ignoreDeprecations": "6.0",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "baseUrl": "./"
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ],
+}

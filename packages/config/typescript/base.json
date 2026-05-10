@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schemastore.org",
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "ES2022"
+  }
+}
