@@ -1,10 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalPassThroughEnv": ["API_PORT"], 
+  "globalDependencies": [".env"], 
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": [".next/**", "dist/**"],
+      "env": ["NODE_ENV", "API_PORT", "JWT_SECRET", "DATABASE_URL", "FRONTEND_URL"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.test.ts"]
     },
     "dev": {
       "cache": false,

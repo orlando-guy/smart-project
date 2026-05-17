@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @default(dbgenerated("gen_random_uuid()")) @unique
+  email     String   @unique
+  name      String
+  role      Role     @default(USER)
+  password  String
+  createdAt DateTime @default(now())
+  project   Project[]
+  teams Team[]
+  tasks Task[]
+  documents Document[]
+  comments Comment[]
+  notification Notification[]
+}
+
+model Project {
+  id          String   @default(dbgenerated("gen_random_uuid()")) @unique
+  titre       String   @unique
+  description String
+  createdAt   DateTime @default(now())
+  leadId      String
+  lead        User     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  teams Team[]
+  tasks Task[]
+  documents Document[]
+}
+
+model Team {
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+}
+
+model Task {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  title String @unique
+  description String?
+  endDate DateTime?
+  priority ProjectPriority
+  statut TaskStatus @default(NOT_STARTED)
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedUserId String
+  assignedUser User @relation(fields: [assignedUserId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+}
+
+model Document {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  fileName String
+  type DocumentTypes
+  uploadDate DateTime @default(now())
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId String
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  createdAt   DateTime @default(now())
+  taskId String
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId String
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  message String
+  createdAt   DateTime @default(now())
+  targetedUserId String
+  targetedUser User @relation(fields: [targetedUserId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProjectPriority {
+  MUST
+  SHOULD
+  COULD
+  WONT
+}
+
+enum TaskStatus {
+  ACHIEVED
+  ONGOING
+  NOT_STARTED
+}
+
+enum DocumentTypes {
+  DOCUMENT
+  IMAGE
+}

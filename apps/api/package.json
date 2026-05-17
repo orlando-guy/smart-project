@@ -4,21 +4,34 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env API_PORT=4000 tsx watch src/index.ts",
-    "build": "tsc"
+    "dev": "cross-env API_PORT=4000 tsx watch --tsconfig ./tsconfig.json src/app.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@repo/config": "workspace:*",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.40",
     "cross-env": "^10.1.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.6"
   },
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@repo/database": "workspace:*",
     "@repo/shared": "workspace:*",
-    "express": "^5.2.1"
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^3.25.76",
+    "zod-express-middleware": "^1.4.0"
   }
 }

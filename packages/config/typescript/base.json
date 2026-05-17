@@ -4,8 +4,12 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "sourceMap": true,
+    "declarationMap": true,
+    "declaration": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "target": "ES2022"
+    "target": "ESNext",
+    "module": "ESNext"
   }
 }

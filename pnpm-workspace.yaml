@@ -2,6 +2,9 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@prisma/engines': false
+  better-sqlite3: true
   esbuild: false
+  prisma: false
   sharp: false
   unrs-resolver: false
