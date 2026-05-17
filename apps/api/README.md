@@ -24,7 +24,7 @@ Créez un fichier `.env` à la racine de ce dossier (`apps/api/.env`) en vous ba
 
 ```env
 NODE_ENV=development
-PORT=5000
+PORT=4000
 JWT_SECRET=generer_une_cle_secrete_de_minimum_32_caracteres
 DATABASE_URL=file:../../packages/database/prisma/dev.db
 ```
@@ -34,18 +34,18 @@ Avant de lancer l'API, vous devez générer le client Prisma et appliquer les mi
 
 ```bash
 # Depuis la racine du monorepo
-npx turbo db:migrate
+pnpm turbo db:migrate
 # Ou directement dans packages/database
-npx prisma migrate dev
+pnpm prisma migrate dev
 ```
 
 ## 🚀 Commandes Disponibles
 Toutes les commandes peuvent être lancées depuis la racine du monorepo via Turborepo, ou directement dans ce dossier :
 
-* `npm run dev` : Démarre le serveur Express en mode développement avec rechargement à chaud (Hot Reload via `tsx`).
-* `npm run build`: Compile le projet TypeScript vers le dossier `dist/` pour la production.
-* `npm run test` : Exécute la suite de tests unitaires via Vitest.
-* `npm run test:watch` : Lance les tests en mode observation.
+* `pnpm run dev` : Démarre le serveur Express en mode développement avec rechargement à chaud (Hot Reload via `tsx`).
+* `pnpm run build`: Compile le projet TypeScript vers le dossier `dist/` pour la production.
+* `pnpm run test` : Exécute la suite de tests unitaires via Vitest.
+* `pnpm run test:watch` : Lance les tests en mode observation.
 
 ------------------------------
 ## 🔐 Règles de Sécurité et Bonnes Pratiques## 1. Partage de Schémas (Zod)
