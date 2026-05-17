@@ -24,7 +24,7 @@ Créez un fichier `.env` à la racine de ce dossier (`apps/api/.env`) en vous ba
 
 ```env
 NODE_ENV=development
-PORT=4000
+API_PORT=4000
 JWT_SECRET=generer_une_cle_secrete_de_minimum_32_caracteres
 DATABASE_URL=file:../../packages/database/prisma/dev.db
 ```
