@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id        String   @default(dbgenerated("gen_random_uuid()")) @unique
+  id        String   @default(uuid()) @unique
   email     String   @unique
   name      String
   role      Role     @default(USER)
@@ -28,7 +28,7 @@ model User {
 }
 
 model Project {
-  id          String   @default(dbgenerated("gen_random_uuid()")) @unique
+  id          String   @default(uuid()) @unique
   titre       String   @unique
   description String
   createdAt   DateTime @default(now())
@@ -50,7 +50,7 @@ model Team {
 }
 
 model Task {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  id String @id @default(uuid()) @unique
   title String @unique
   description String?
   endDate DateTime?
@@ -65,7 +65,7 @@ model Task {
 }
 
 model Document {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  id String @id @default(uuid()) @unique
   fileName String
   type DocumentTypes
   uploadDate DateTime @default(now())
@@ -76,7 +76,7 @@ model Document {
 }
 
 model Comment {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  id String @id @default(uuid()) @unique
   createdAt   DateTime @default(now())
   taskId String
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -85,7 +85,7 @@ model Comment {
 }
 
 model Notification {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @unique
+  id String @id @default(uuid()) @unique
   message String
   createdAt   DateTime @default(now())
   targetedUserId String
