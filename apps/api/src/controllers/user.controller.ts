@@ -38,4 +38,22 @@ export class UserController {
             data: req.user
         })
     }
+
+    async getSingleUser(req: Request, res: Response) {
+        const { id } = req.params;
+        const data = await userService.fetchUser(id as string);
+        return res.status(200).json({
+            success: true,
+            data
+        }) 
+    }
+
+    async getUsers(req: Request, res: Response) {
+        const data = await userService.fetchUsers();
+        
+        return res.status(200).json({
+            success: true,
+            data
+        })
+    }
 }

@@ -28,7 +28,11 @@ userRoutes.post(
    userController.login
 );
 
+userRoutes.get('/all', userController.getUsers)
+
 // Routes Protégées
 userRoutes.get('/me', requireAuth, userController.getProfile);
+
+userRoutes.get('/:id', userController.getSingleUser)
 
 export default userRoutes;

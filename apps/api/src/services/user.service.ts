@@ -85,4 +85,24 @@ export class UserService {
             token
         }
     }
+
+    async fetchUsers() {
+        return await this.userRepository.findAll();
+    }
+
+    async fetchUser(id: string): Promise<UserResponse> {
+        const user = await this.userRepository.findById(id);
+        if (!user) {
+            const error = new Error('L\'utilisateur que vous rechercher n\'existe pas !');
+            (error as any).statusCode = 401;
+            throw error;
+        }
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt
+        };
+    }
 }
