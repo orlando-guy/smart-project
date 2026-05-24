@@ -56,14 +56,14 @@ export class UserService {
         const user = await this.userRepository.findByEmail(data.email);
         if (!user) {
             const error = new Error('Identifiant invalide');
-            (error as any).statusCode = 401;
+            (error as any).statusCode = 422;
             throw error;
         }
 
         const isPasswordValid = await bcrypt.compare(data.password, user.password);
         if (!isPasswordValid) {
             const error = new Error('Mot de passe invalide');
-            (error as any).statusCode = 401;
+            (error as any).statusCode = 422;
             throw error;
         }
 
@@ -100,7 +100,7 @@ export class UserService {
         const user = await this.userRepository.findById(id);
         if (!user) {
             const error = new Error('L\'utilisateur que vous rechercher n\'existe pas !');
-            (error as any).statusCode = 401;
+            (error as any).statusCode = 404;
             throw error;
         }
 
