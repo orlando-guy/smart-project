@@ -24,7 +24,7 @@ const JWT_SECRET = env.JWT_SECRET;
 export class UserService {
     private readonly userRepository = new UserRepository()
     // Simulation d'une base de données ou d'un ORM (prisma/mogoose)
-    async createUser(userData: User): Promise<UserResponse> {
+    async createUser(userData: User): Promise<UserResponse & { password: string }> {
         // Exemple de logique métier (Vérification existence, Hashage du mot de passe...)
         const existingUser = await this.userRepository.findByEmail(userData.email)
 
@@ -48,6 +48,7 @@ export class UserService {
             id: user.id,
             name: user.name,
             email: user.email,
+            password: userData.password,
             createdAt: user.createdAt
         }
     }
@@ -55,14 +56,14 @@ export class UserService {
     async login(data: LoginUserInput): Promise<LoginResponse> {
         const user = await this.userRepository.findByEmail(data.email);
         if (!user) {
-            const error = new Error('Identifiant invalide');
+            const error = new Error('E-mail ou mot de passe invalide');
             (error as any).statusCode = 422;
             throw error;
         }
 
         const isPasswordValid = await bcrypt.compare(data.password, user.password);
         if (!isPasswordValid) {
-            const error = new Error('Mot de passe invalide');
+            const error = new Error('E-mail ou mot de passe invalide');
             (error as any).statusCode = 422;
             throw error;
         }
