@@ -3,7 +3,7 @@ import Image from "next/image"
 
 export default function SingInPage() {
     return (
-        <main className="wrapper container bg-[#FAFBFC] max-w-screen overflow-hidden">
+        <main className="container bg-[#FAFBFC] max-w-screen max-h-screen overflow-hidden">
             <div className="w-full h-full flex items-center justify-center">
                 <LoginForm />
                 <div className="absolute bottom-0 left-0 hidden md:inline-block">
