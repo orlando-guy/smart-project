@@ -35,7 +35,7 @@ describe('requireAuth middleware -- absence du header Authorization', () => {
         const next = createMockNext();
 
         // WHEN
-        requireAuth(req as any, res as any, next);
+        requireAuth(req as any, res, next);
 
         // THEN
         expect(res.status).toHaveBeenCalledWith(401);
