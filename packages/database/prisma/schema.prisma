@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id        String   @default(uuid()) @unique
+  id        String   @id @default(uuid()) @unique
   email     String   @unique
   name      String
   role      Role     @default(USER)
@@ -28,7 +28,7 @@ model User {
 }
 
 model Project {
-  id          String   @default(uuid()) @unique
+  id          String   @id @default(uuid()) @unique
   titre       String   @unique
   description String
   createdAt   DateTime @default(now())
