@@ -18,11 +18,17 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
+    // Cas 3 : L'utilisateur est déjà connecté et tente d'aller sur la page d'inscription
+    if (pathname.startsWith('/sign-up') && token) {
+        // Redirige directement ver le dashboard
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
     // Laisse passer la requête si aucune condition n'est enfreinte
     NextResponse.next();
 }
 
 // Configuer les routes sur lesquelles le middleware doit s'exécuter
 export const config = {
-    matcher: ['/dashboard/:path*', '/login']
+    matcher: ['/dashboard/:path*', '/login', '/sign-up']
 }
