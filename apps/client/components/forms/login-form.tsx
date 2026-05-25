@@ -9,13 +9,12 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { useLoginMutation } from "@/hooks/use-auth-mutations";
-import { useAuthStore } from "@/store/useAuthStore";
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { loginAndRedirect } from "@/lib/auth-util";
 
 
 export const LoginForm = () => {
-    const { setAuth } = useAuthStore();
     const router = useRouter();
     const searchParams = useSearchParams()
     const isExpired = searchParams.get('expired') === 'true';
@@ -36,15 +35,7 @@ export const LoginForm = () => {
             onSuccess: async (data) => {
                 // Met à jour l'état en mémoire
                 const { token, user } = data.data;
-                setAuth(token, user);
-                // Force Zustand à synchroniser le localStorage immédiatement
-                useAuthStore.persist.rehydrate();
-
-                // Écrit le cookie pour le Middleware Next.js
-                document.cookie = `auth_token=${data.token}; path=/; max-age=604800; SameSite=Lax; Secure`;
-
-                // Redirige SEULEMENT après s'être assuré que les données sont écrites
-                router.push('/dashboard');
+                loginAndRedirect({ token, user }, router)
             },
             onError: (error) => {
                 if (axios.isAxiosError(error)) {
@@ -155,7 +146,7 @@ export const LoginForm = () => {
                 >
                     {loginMutation.isPending ? 'Connexion en cours...' : 'Se connecter'}
                 </Button>
-                <Link href="#" className="text-brand self-end">Créer un compte</Link>
+                <Link href="/sign-up" className="text-brand self-end">Créer un compte</Link>
             </CardFooter>
         </Card>
     )
