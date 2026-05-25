@@ -13,7 +13,6 @@ const userService = new UserService()
 
 export class UserController {
     async register(req: Request<{}, {}, User>, res: Response) {
-        console.log(req.body)
         // Les données de req.body sont déjà validées et typées grâce au middleware
         const newUser = await userService.createUser(req.body);
 
