@@ -72,7 +72,7 @@ export class UserService {
             name: user.name,
             email: user.email
         }
-        
+
         // Génération du Token JWT
         const token = jwt.sign(
             filteredUser,
@@ -87,7 +87,13 @@ export class UserService {
     }
 
     async fetchUsers() {
-        return await this.userRepository.findAll();
+        const users = await this.userRepository.findAll();
+        return users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt
+        }));
     }
 
     async fetchUser(id: string): Promise<UserResponse> {
