@@ -41,7 +41,7 @@ describe('requireAuth middleware -- absence du header Authorization', () => {
         expect(res.status).toHaveBeenCalledWith(401);
         expect(res.json).toHaveBeenCalledWith({
             success: false,
-            message: 'Accès non autorisé : Token invalide'
+            message: 'Accès non autorisé : Token manquant'
         });
         expect(next).not.toHaveBeenCalled();
     });
