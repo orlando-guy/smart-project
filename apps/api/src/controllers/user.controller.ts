@@ -13,7 +13,6 @@ const userService = new UserService()
 
 export class UserController {
     async register(req: Request<{}, {}, User>, res: Response) {
-        console.log(req.body)
         // Les données de req.body sont déjà validées et typées grâce au middleware
         const newUser = await userService.createUser(req.body);
 
@@ -36,6 +35,24 @@ export class UserController {
         return res.status(200).json({
             success: true,
             data: req.user
+        })
+    }
+
+    async getSingleUser(req: Request, res: Response) {
+        const { id } = req.params;
+        const data = await userService.fetchUser(id as string);
+        return res.status(200).json({
+            success: true,
+            data
+        }) 
+    }
+
+    async getUsers(req: Request, res: Response) {
+        const data = await userService.fetchUsers();
+        
+        return res.status(200).json({
+            success: true,
+            data
         })
     }
 }

@@ -21,32 +21,27 @@ import jwt from 'jsonwebtoken';
 // Ce middleware intercepte le jeton, le valide et bloque l'accès si nécessaire :
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_key'
 
-export const requireAuth = ( req: Request, res: Response, next: NextFunction ) => {
-    const authHeader = req?.headers.authorization
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers?.authorization
 
-    if (authHeader) {
-        if (!authHeader.startsWith('Bearer ')) {
-            res.status(401).json({
-                sucess: false,
-                message: "Accès non autorisé : Token manquant"
-            })
-        }
-    
-        const token = authHeader.split(' ')[1];
-
-        try {
-            const decoded = jwt.verify(token, JWT_SECRET) as {id: string, email:string, name: string}
-            // On attache les données de l'utilisateur à la requête
-            req.user = decoded;
-            next();
-        } catch (error) {
-            res.status(401).json({
-                success: false,
-                message: "Accès non autorisé : Token invalide",
-                mainError: error
-            })
-        }
-
+    if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({
+            success: false,
+            message: "Accès non autorisé : Token manquant"
+        })
     }
+    const token = authHeader.split(' ')[1];
 
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: string, email: string, name: string }
+        // On attache les données de l'utilisateur à la requête
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Accès non autorisé : Token invalide",
+            mainError: error
+        })
+    }
 }

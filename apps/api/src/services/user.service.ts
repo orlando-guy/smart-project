@@ -72,7 +72,7 @@ export class UserService {
             name: user.name,
             email: user.email
         }
-        
+
         // Génération du Token JWT
         const token = jwt.sign(
             filteredUser,
@@ -84,5 +84,31 @@ export class UserService {
             user: filteredUser,
             token
         }
+    }
+
+    async fetchUsers() {
+        const users = await this.userRepository.findAll();
+        return users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt
+        }));
+    }
+
+    async fetchUser(id: string): Promise<UserResponse> {
+        const user = await this.userRepository.findById(id);
+        if (!user) {
+            const error = new Error('L\'utilisateur que vous rechercher n\'existe pas !');
+            (error as any).statusCode = 401;
+            throw error;
+        }
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt
+        };
     }
 }
