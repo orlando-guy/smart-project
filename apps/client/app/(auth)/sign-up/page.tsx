@@ -9,7 +9,8 @@ export default function SignUpPage() {
                 <div className="absolute bottom-0 left-0 hidden md:inline-block">
                     <Image
                         src="/default_left.558fbf68.svg"
-                        alt="left planners"
+                        alt=""
+                        aria-hidden="true"
                         width={550}
                         height={450}
                         className="object-cover w-110 h-auto isolate"
@@ -18,7 +19,8 @@ export default function SignUpPage() {
                 <div className="absolute bottom-0 right-0 hidden md:inline-block">
                     <Image
                         src="/default_right.f8462257.svg"
-                        alt="left planners"
+                        alt=""
+                        aria-hidden="true"
                         width={550}
                         height={450}
                         className="object-cover w-110 h-auto isolate"

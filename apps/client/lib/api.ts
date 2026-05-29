@@ -43,7 +43,9 @@ api.interceptors.response.use(
             useAuthStore.getState().logout();
 
             // Étape B : Supprimer le cookie d'authentification pour le middleware
-            document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure';
+            if (typeof document !== 'undefined') {
+                document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure';
+            }
 
             // Étape C : Redirection forcée vers la page de connexion
             // Étan donné que nous sommes hors d'un composant React, on utilise l'API native du navigateur

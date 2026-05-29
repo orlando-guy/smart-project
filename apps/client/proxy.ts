@@ -25,7 +25,7 @@ export function proxy(request: NextRequest) {
     }
 
     // Laisse passer la requête si aucune condition n'est enfreinte
-    NextResponse.next();
+    return NextResponse.next();
 }
 
 // Configuer les routes sur lesquelles le middleware doit s'exécuter

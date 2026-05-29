@@ -30,10 +30,10 @@ export const SignUpForm = () => {
     const signupMutation = useSignupMutation();
     const loginMutation = useLoginMutation();
 
-    function onSubmit(data: RegisterUserInput) {
-        signupMutation.mutate(data, {
-            onSuccess: async (data) => {
-                const { email, password } = data.data;
+    function onSubmit(formData: RegisterUserInput) {
+        signupMutation.mutate(formData, {
+            onSuccess: async () => {
+                const { email, password } = formData;
                 console.log({ email, password });
                 debugger;
                 // Connecte le nouvel utilisateur

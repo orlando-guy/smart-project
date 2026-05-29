@@ -15,7 +15,6 @@ export const useAuthStore = create<AuthState>()(
             token: null,
             user: null,
             setAuth: (token, user) => {
-                console.log("zutand token: ", token);
                 set({ token, user })
             },
             logout: () => set({ token: null, user: null })
