@@ -18,12 +18,12 @@ const userController = new UserController();
 
 // Routes Publiques
 userRoutes.post(
-    '/register',
+    '/auth/register',
     processRequest({body: UserSchema}),
     userController.register
 );
 userRoutes.post(
-    '/login',
+    '/auth/login',
    processRequest({body: LoginUserSchema}),
    userController.login
 );
