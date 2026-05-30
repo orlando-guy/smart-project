@@ -16,4 +16,11 @@ projectRoutes.post(
     projectController.register
 );
 
+projectRoutes.get(
+    '/projects',
+    requireAuth,
+    projectController.allUserProjects
+);
+
+
 export default projectRoutes;

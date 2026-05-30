@@ -28,5 +28,10 @@ export class ProjectService {
             console.error(error);
             throw duplicateError;
         }
-    }    
+    }
+    
+    async listUserProject(userId: string): Promise<Project[]> {
+        const projects = await this.projectRepository.findProjectByUserId(userId);
+        return projects;
+    }
 }
