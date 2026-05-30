@@ -31,4 +31,17 @@ export class ProjecController {
             data
         })
     }
+
+    async update(req: Request, res: Response) {
+        const { id } = req.params;
+        const updatedProject = await projectService.editProject(
+            id as string,
+            req.body
+        );
+
+        return res.status(201).json({
+            success: true,
+            data: updatedProject
+        });
+    }
 }

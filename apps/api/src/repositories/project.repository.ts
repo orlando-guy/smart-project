@@ -84,10 +84,13 @@ export class ProjectRepository {
     }
 
     // Modification du projet
-    async edit(id: string, data: ProjectInputType) {
+    async edit(id: string, editProjectData: ProjectInputType) {
         return this.#prisma.project.update({
             where: {id},
-            data
+            data: {
+                titre: editProjectData.title,
+                description: editProjectData.description
+            }
         })
     }
 }

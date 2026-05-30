@@ -48,4 +48,27 @@ export class ProjectService {
             );
         }
     }
+
+    async editProject(projectId: string, projectData: ProjectInput) {
+        // Vérifier que le projet existe
+        const isProjectExists = await this.projectRepository.findById(projectId);
+    
+        if (!isProjectExists) {
+            generateErrorWithStatusCode(
+                'Le projet que vous voulez que vous voulez édité n\'existe pas',
+                404
+            )
+        }
+        // Mettre à jour le projet
+        try {
+            const data = await this.projectRepository.edit(projectId, projectData);
+            return data;
+        } catch(error) {
+            generateErrorWithStatusCode(
+                'Une érreur innatendue est survenue durant l\'opération',
+                500,
+                error
+            )
+        }
+    }
 }
