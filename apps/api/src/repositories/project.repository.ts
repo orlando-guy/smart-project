@@ -1,5 +1,6 @@
-import { Project, getPrisma } from "@repo/database";
+import { getPrisma } from "@repo/database";
 import { ProjectInput as ProjectInputType } from "@repo/shared";
+import { string } from "zod";
 
 type ProjectInputWithLead = ProjectInputType & {
     authorId: string;
@@ -22,6 +23,39 @@ export class ProjectRepository {
     // Trouver un projet par son ID
     async findById(id: string) {
         return this.#prisma.project.findUnique({
+            select: {
+                id: true,
+                titre: true,
+                description: true,
+                createdAt: true,
+                tasks: {
+                    select: {
+                        title: true,
+                        statut: true,
+                        description: true,
+                        priority: true,
+                        endDate: true,
+                        // TODO Also include comment when it will be ready
+                        assignedUser: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        }
+                    }
+                },
+                teams: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                }
+            },
             where: {id}
         })
     }

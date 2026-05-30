@@ -21,6 +21,11 @@ projectRoutes.get(
     requireAuth,
     projectController.allUserProjects
 );
+projectRoutes.get(
+    '/project/:id',
+    requireAuth,
+    projectController.getProjectDetail
+);
 
 
 export default projectRoutes;

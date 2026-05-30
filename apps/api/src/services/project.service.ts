@@ -1,5 +1,6 @@
 import { Project } from "@repo/database";
 import { ProjectInput } from "@repo/shared";
+import { generateErrorWithStatusCode } from "src/lib/utils";
 import { ProjectRepository } from "src/repositories/project.repository";
 
 export class ProjectService {
@@ -33,5 +34,18 @@ export class ProjectService {
     async listUserProject(userId: string): Promise<Project[]> {
         const projects = await this.projectRepository.findProjectByUserId(userId);
         return projects;
+    }
+
+    async fetchProjectDetail(projectId: string) {
+        try {
+            const projectDetail = await this.projectRepository.findById(projectId);
+            return projectDetail;
+        } catch(error) {
+            generateErrorWithStatusCode(
+                'Impossible de recupére les données demandés. Une érreur est survenue.',
+                500,
+                error
+            );
+        }
     }
 }

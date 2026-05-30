@@ -17,7 +17,16 @@ export class ProjecController {
 
     async allUserProjects(req: Request, res: Response) {
         const data = await projectService.listUserProject(req.user.id)
-        return res.status(200).json({
+        return res.status(201).json({
+            success: true,
+            data
+        })
+    }
+
+    async getProjectDetail(req: Request, res: Response) {
+        const { id: projectId } = req.params;
+        const data = await projectService.fetchProjectDetail(projectId as string);
+        return res.status(201).json({
             success: true,
             data
         })
