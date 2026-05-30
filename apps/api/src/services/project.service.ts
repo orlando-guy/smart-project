@@ -6,9 +6,19 @@ import { ProjectRepository } from "src/repositories/project.repository";
 export class ProjectService {
     private readonly projectRepository = new ProjectRepository()
 
+    private async isExistingProject(targert: string, hintTarget: "title" | "id"): Promise<boolean> {
+        let result;
+        if (hintTarget === "title") {
+            result = await this.projectRepository.findByTitle(targert);
+        } else {
+            result = await this.projectRepository.findById(targert);
+        }
+        return !!result;
+    }
+
     async createProject(authorId: string, projectData: ProjectInput): Promise<Project> {
         const { title } = projectData;
-        const existingProject = await this.projectRepository.findByTitle(title)
+        const existingProject = await this.isExistingProject(title, "title");
 
         if (existingProject) {
             const error = new Error("Le projet que vous éssayer de créer existe déjà");
@@ -51,11 +61,11 @@ export class ProjectService {
 
     async editProject(projectId: string, projectData: ProjectInput) {
         // Vérifier que le projet existe
-        const isProjectExists = await this.projectRepository.findById(projectId);
+        const isProjectExists = await this.isExistingProject(projectId, "id");
     
         if (!isProjectExists) {
             generateErrorWithStatusCode(
-                'Le projet que vous voulez que vous voulez édité n\'existe pas',
+                'Le projet que vous voulez éditer n\'existe pas',
                 404
             )
         }
@@ -69,6 +79,28 @@ export class ProjectService {
                 500,
                 error
             )
+        }
+    }
+
+    async deleteProject(projectId: string) {
+        const isProjectExists = await this.isExistingProject(projectId, "id");
+
+        if (!isProjectExists) {
+            generateErrorWithStatusCode(
+                'Le projet que vous voulez supprimer n\'existe pas',
+                404
+            );
+        }
+
+        try {
+            const data = await this.projectRepository.drop(projectId);
+            return data;
+        } catch(error) {
+            generateErrorWithStatusCode(
+                'Une érreur innatendue est survenue durant l\'opération',
+                500,
+                error
+            );
         }
     }
 }

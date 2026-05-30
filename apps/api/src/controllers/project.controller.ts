@@ -44,4 +44,14 @@ export class ProjecController {
             data: updatedProject
         });
     }
+
+    async deletete(req: Request, res: Response) {
+        const { id } = req.params;
+        const data = await projectService.deleteProject(id as string);
+
+        return res.status(201).json({
+            success: true,
+            data
+        })
+    }
 }

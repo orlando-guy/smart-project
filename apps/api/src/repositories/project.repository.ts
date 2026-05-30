@@ -1,6 +1,5 @@
 import { getPrisma } from "@repo/database";
 import { ProjectInput as ProjectInputType } from "@repo/shared";
-import { string } from "zod";
 
 type ProjectInputWithLead = ProjectInputType & {
     authorId: string;
@@ -92,5 +91,16 @@ export class ProjectRepository {
                 description: editProjectData.description
             }
         })
+    }
+
+    // Suppression du projet
+    async drop(id: string) {
+        return this.#prisma.project.delete({
+            where: {id},
+            include: {
+                tasks: true,
+                teams: true
+            }
+        });
     }
 }

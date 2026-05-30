@@ -31,6 +31,11 @@ projectRoutes.put(
     requireAuth,
     projectController.update
 );
+projectRoutes.delete(
+    '/project/:id',
+    requireAuth,
+    projectController.deletete
+);
 
 
 export default projectRoutes;
