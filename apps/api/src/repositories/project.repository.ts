@@ -76,6 +76,18 @@ export class ProjectRepository {
     // Récupérer la liste des projets d'un utilisateur
     async findProjectByUserId(userId: string) {
         return this.#prisma.project.findMany({
+            select: {
+                id: true,
+                titre: true,
+                description: true,
+                leadId: true,
+                createdAt: true,
+                lead: {
+                    select: {
+                        name: true,
+                    }
+                }
+            },
             where: {
                 leadId: userId
             }
