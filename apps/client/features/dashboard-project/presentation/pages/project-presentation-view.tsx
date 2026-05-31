@@ -19,7 +19,7 @@ export default function ProjectPresentationView() {
 
     if (isLoading) {
         return (
-            <div className="px-4 md:px-6">
+            <div className="container px-4 md:px-6">
                 <ProjectTableSkeleton />
             </div>
         )
@@ -56,7 +56,7 @@ export default function ProjectPresentationView() {
     }
 
     return (
-        <div className="px-4 md:px-6">
+        <div className="container px-4 md:px-6">
             <ProjectTable
                 projects={data as Project[]}
             />

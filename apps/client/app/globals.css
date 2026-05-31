@@ -149,7 +149,7 @@
   }
 
   .container {
-    @apply pt-23.5 pb-18 min-h-screen;
+    @apply py-8 min-h-screen;
   }
 
   /* Typography utilities */
@@ -170,6 +170,7 @@
   }
 
 }
+
 .shadow-soft-medium {
   box-shadow: var(--shadow-soft-md);
 }
@@ -180,6 +181,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -191,6 +193,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(-8px);
