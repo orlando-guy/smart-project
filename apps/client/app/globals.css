@@ -173,3 +173,34 @@
 .shadow-soft-medium {
   box-shadow: var(--shadow-soft-md);
 }
+
+/* Search dropdown animation */
+@keyframes searchDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes searchDropdownOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.search-dropdown-enter {
+  animation: searchDropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.search-dropdown-exit {
+  animation: searchDropdownOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
