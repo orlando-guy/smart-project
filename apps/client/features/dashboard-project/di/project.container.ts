@@ -1,0 +1,10 @@
+import { CreateProjectUseCase } from "../domain/usecases/CreateProjectUseCase";
+import { GetProjectUseCase } from "../domain/usecases/GetProjectUseCase";
+import { DeleteProjectUseCase } from "../domain/usecases/DeleteProjectUseCase";
+import { ProjectRepository } from "../infrastructure/repositories/ProjectRepository";
+
+const projectRepository = new ProjectRepository();
+
+export const getProjectUseCase = new GetProjectUseCase(projectRepository)
+export const createProjectUseCase = new CreateProjectUseCase(projectRepository);
+export const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
