@@ -7,6 +7,10 @@ export interface IProjectRepository {
         query?: QueryBuilder
     ): Promise<Project[]>
 
+    getSingleProject(
+        projectId: string
+    ): Promise<Project>
+
     create(
         payload: CreateProjectDto
     ): Promise<Omit<Project, 'lead'>>

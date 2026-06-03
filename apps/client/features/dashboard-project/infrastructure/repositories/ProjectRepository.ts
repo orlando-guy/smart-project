@@ -22,6 +22,21 @@ export class ProjectRepository
         ))
     }
 
+    async getSingleProject(projectId: string): Promise<Project> {
+        const { data: result } = await api.get(`/project/${projectId}`);
+
+        return new Project(
+            result.data.id,
+            result.data.titre,
+            result.data.description,
+            result.data.leadId,
+            result.data.createdAt,
+            result.data.lead,
+            result.data.teams,
+            result.data.tasks
+        );
+    }
+
     async create(payload: ProjectInput): Promise<Omit<Project, "lead">> {
         const result = await api.post<Project>('/project/register', payload);
         return new Project(
