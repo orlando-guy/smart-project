@@ -27,7 +27,6 @@ export default function SingInPage() {
                     />
                 </div>
             </div>
-            {/* <div className="login-right-img" /> */}
         </main>
     )
 }
