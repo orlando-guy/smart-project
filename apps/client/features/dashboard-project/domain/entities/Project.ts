@@ -21,7 +21,7 @@ export class Project {
         public tasks?: {
             description: string | null;
             title: string;
-            endDate: Date | null;
+            endDate: string | null;
             priority: ProjectPriority;
             statut: TaskStatus;
             assignedUser: {

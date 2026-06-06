@@ -10,8 +10,8 @@ const projectController = new ProjecController();
 projectRoutes.post(
     '/project/register',
     [
-        processRequest({body: ProjectSchema}),
-        requireAuth
+        requireAuth,
+        processRequest({ body: ProjectSchema }),
     ],
     projectController.register
 );
@@ -28,7 +28,10 @@ projectRoutes.get(
 );
 projectRoutes.put(
     '/project/:id',
-    requireAuth,
+    [
+        requireAuth,
+        processRequest({ body: ProjectSchema }),
+    ],
     projectController.update
 );
 projectRoutes.delete(

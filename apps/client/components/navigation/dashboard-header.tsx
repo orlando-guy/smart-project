@@ -23,6 +23,7 @@ const DashboardHeader = () => {
 
   const [showDropdown, setShowDropdown] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -36,13 +37,22 @@ const DashboardHeader = () => {
 
   // Close dropdown with exit animation
   const closeDropdown = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+    }
     setIsClosing(true)
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setShowDropdown(false)
       setIsClosing(false)
       clearSearch()
     }, 200) // matches animation duration
   }, [clearSearch])
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -100,7 +110,7 @@ const DashboardHeader = () => {
               className="absolute left-3 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               aria-label="Search projects"
             >
-              <Search className="h-[18px] w-[18px]" />
+              <Search className="h-4.5 w-4.5" />
             </button>
             <input
               ref={inputRef}
@@ -122,7 +132,7 @@ const DashboardHeader = () => {
             className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
             aria-label="Calendar"
           >
-            <CalendarDays className="h-[18px] w-[18px]" />
+            <CalendarDays className="h-4.5 w-4.5" />
           </Button>
 
           <Button
@@ -131,7 +141,7 @@ const DashboardHeader = () => {
             className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
             aria-label="Help"
           >
-            <CircleHelp className="h-[18px] w-[18px]" />
+            <CircleHelp className="h-4.5 w-4.5" />
           </Button>
 
           <Button
@@ -140,9 +150,9 @@ const DashboardHeader = () => {
             className="relative h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
             aria-label="Notifications"
           >
-            <Bell className="h-[18px] w-[18px]" />
+            <Bell className="h-4.5 w-4.5" />
             {/* Notification indicator dot */}
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--text-danger)] ring-2 ring-background" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-(--text-danger) ring-2 ring-background" />
           </Button>
         </div>
       </div>
@@ -160,9 +170,8 @@ const DashboardHeader = () => {
           {/* Results panel */}
           <div
             ref={dropdownRef}
-            className={`absolute top-full left-0 right-0 z-50 mx-4 md:mx-6 mt-1 max-h-80 overflow-y-auto rounded-xl border border-border bg-background ${
-              isClosing ? 'search-dropdown-exit' : 'search-dropdown-enter'
-            }`}
+            className={`absolute top-full left-0 right-0 z-50 mx-4 md:mx-6 mt-1 max-h-80 overflow-y-auto rounded-xl border border-border bg-background ${isClosing ? 'search-dropdown-exit' : 'search-dropdown-enter'
+              }`}
             style={{ boxShadow: 'var(--shadow-soft-lg)' }}
           >
             {isLoading ? (

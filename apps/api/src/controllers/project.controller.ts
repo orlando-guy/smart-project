@@ -16,7 +16,7 @@ export class ProjecController {
         const newProject = await this.projectService.createProject(req.user.id, req.body);
 
         return res.status(201).json({
-            succes: true,
+            success: true,
             data: newProject
         })
     }

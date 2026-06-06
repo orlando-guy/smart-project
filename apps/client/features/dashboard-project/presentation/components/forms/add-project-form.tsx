@@ -20,7 +20,6 @@ const AddProjectForm = () => {
         }
     });
     function onSubmit(data: ProjectInput) {
-        console.log(data);
         mutation.mutate(data, {
             onSuccess: async () => {
                 toast.success("Votre projet a été créer avec succès !")
@@ -110,6 +109,7 @@ const AddProjectForm = () => {
                     type="button"
                     variant="outline"
                     onClick={() => form.reset()}
+                    disabled={mutation.isPending}
                 >
                     Réinitialiser
                 </Button>
@@ -117,8 +117,9 @@ const AddProjectForm = () => {
                     type="submit"
                     form="register-project"
                     className='cursor-pointer'
+                    disabled={mutation.isPending}
                 >
-                    Enregistrer
+                    {mutation.isPending ? "Enregistrement..." : "Enregistrer"}
                 </Button>
             </Field>
         </form>

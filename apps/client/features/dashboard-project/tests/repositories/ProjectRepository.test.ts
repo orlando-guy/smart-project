@@ -30,4 +30,27 @@ describe('ProjectRepository', () => {
         expect(projects[0].titre).toBe('API Project');
         expect(projects[0].constructor.name).toBe('Project');
     });
+
+    it('should normalize the API response when creating a project', async () => {
+        const mockApiResponse = {
+            data: {
+                success: true,
+                data: {
+                    id: 'new-id',
+                    titre: 'New Project',
+                    description: 'New Desc',
+                    leadId: 'u2',
+                    createdAt: new Date()
+                }
+            }
+        };
+        (api.post as any).mockResolvedValue(mockApiResponse);
+
+        const repo = new ProjectRepository();
+        const project = await repo.create({ title: 'New Project', description: 'New Desc' });
+
+        expect(api.post).toHaveBeenCalledWith('/project/register', expect.anything());
+        expect(project.id).toBe('new-id');
+        expect(project.titre).toBe('New Project');
+    });
 });

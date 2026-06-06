@@ -7,27 +7,27 @@ import { getProjectUseCase } from "../../di/project.container"
 
 export function useSearchProjects() {
     const [searchTerm, setSearchTerm] = useState("")
-    const [enabled, setEnabled] = useState(false)
+    const [submittedTerm, setSubmittedTerm] = useState("")
 
     const query = new QueryBuilder()
         .paginate(1, 10)
-        .search(searchTerm)
+        .search(submittedTerm)
 
-    const { data: results, isLoading, refetch } = useQuery({
-        queryKey: ['projects', 'search', searchTerm],
+    const { data: results, isLoading } = useQuery({
+        queryKey: ['projects', 'search', submittedTerm],
         queryFn: () => getProjectUseCase.execute(query),
-        enabled,
+        enabled: submittedTerm.trim().length > 0,
     })
 
     const triggerSearch = useCallback(() => {
-        if (searchTerm.trim().length === 0) return
-        setEnabled(true)
-        refetch()
-    }, [searchTerm, refetch])
+        const term = searchTerm.trim()
+        if (term.length === 0) return
+        setSubmittedTerm(term)
+    }, [searchTerm])
 
     const clearSearch = useCallback(() => {
         setSearchTerm("")
-        setEnabled(false)
+        setSubmittedTerm("")
     }, [])
 
     return {
@@ -35,7 +35,7 @@ export function useSearchProjects() {
         setSearchTerm,
         results: results ?? [],
         isLoading,
-        isActive: enabled && searchTerm.trim().length > 0,
+        isActive: submittedTerm.trim().length > 0,
         triggerSearch,
         clearSearch,
     }

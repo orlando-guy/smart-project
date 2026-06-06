@@ -67,14 +67,13 @@ const ProjectPresentationDetailView = ({
                 variant="link"
                 className='cursor-pointer'
                 onClick={() => alert('add a new member')} // TODO: Should trigger a modal form to add a new member to the current project
-                asChild
               >
-                <div className='flex items-center gap-2'>
+                <span className='flex items-center gap-2'>
                   <div className='px-[7.5px] py-[4.5px] bg-[#5030E5]/20 rounded-sm'>
                     <PlusIcon color='#5030E5' />
                   </div>
                   <span className='text-[#5030E5] text-base font-medium'>Invite</span>
-                </div>
+                </span>
               </Button>
             <div>
               {/* Avatars */}

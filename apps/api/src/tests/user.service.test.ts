@@ -5,210 +5,197 @@ import { UserRepository } from '../repositories/user.repository'
 vi.mock('../repositories/user.repository')
 
 describe('UserService -- Registry', () => {
-    let userService: UserService;
-    let mockUserRepository: any;
+        let userService: UserService;
+        let mockUserRepository: any;
 
-    beforeEach(() => {
-        vi.clearAllMocks()
-        mockUserRepository = UserRepository.prototype;
-        userService = new UserService()
-    });
-
-    it('devrait inscrire un utilisateur avec succès', async () => {
-        // GIVEN : L'email n'existe pas en base de données
-        const createdAt = new Date();
-        vi.mocked(mockUserRepository.findByEmail).mockResolvedValue(null);
-        vi.mocked(mockUserRepository.create).mockResolvedValue({
-            id: 'user_123',
-            email: 'test@example.com',
-            name: 'John Doe',
-            password: 'hashed_password_123',
-            createdAt: createdAt
+        beforeEach(() => {
+                vi.clearAllMocks()
+                mockUserRepository = UserRepository.prototype;
+                userService = new UserService(mockUserRepository);
         });
 
-        const userData = {
-            email: 'test@example.com',
-            name: 'John Doe',
-            password: 'Password_123'
-        }
+        it('devrait inscrire un utilisateur avec succès', async () => {
+                const createdAt = new Date();
+                vi.mocked(mockUserRepository.findByEmail).mockResolvedValue(null);
+                vi.mocked(mockUserRepository.create).mockResolvedValue({
+                        id: 'user_123',
+                        email: 'test@example.com',
+                        name: 'John Doe',
+                        password: 'hashed_password_123',
+                        createdAt: createdAt
+                });
 
-        // WHEN : On appelle la méthode register du service
-        const result = await userService.createUser(userData as any)
+                const userData = {
+                        email: 'test@example.com',
+                        name: 'John Doe',
+                        password: 'Password_123'
+                }
 
-        // THEN : On vérifie que le résultat renvoie les bonnes informations
-        expect(result).toEqual({
-            id: 'user_123',
-            email: 'test@example.com',
-            name: 'John Doe',
-            password: 'Password_123',
-            createdAt: createdAt
+                // WHEN : On appelle la méthode register du service
+                const result = await userService.createUser(userData as any)
+                // THEN : On vérifie que le résultat renvoie les bonnes informations
+                expect(result).toEqual({
+                        id: 'user_123',
+                        email: 'test@example.com',
+                        name: 'John Doe',
+                        password: 'Password_123',
+                        createdAt: createdAt
+                });
+                expect(mockUserRepository.create).toHaveBeenCalled();
         });
-        expect(mockUserRepository.create).toHaveBeenCalled();
-    });
 
-    it("devrait lever une érreur si l'adresse email est déjà utilisé", async () => {
-        // GIVEN : L'email existe déjà en base de données
-        vi.mocked(mockUserRepository.findByEmail).mockResolvedValue({
-            id: "existing_user",
-            email: "deja.pris@email.com"
+        it("devrait lever une érreur si l'adresse email est déjà utilisé", async () => {
+                vi.mocked(mockUserRepository.findByEmail).mockResolvedValue({
+                        id: "existing_user",
+                        email: "deja.pris@email.com"
+                });
+
+                const userData = {
+                        email: 'deja.pris@email.com',
+                        name: 'John Doe',
+                        password: 'Password_123'
+                }
+
+                await expect(userService.createUser(userData as any))
+                        .rejects.toThrow('Cet email est déjà utilisé');
         });
-
-        const userData = {
-            email: 'deja.pris@email.com',
-            name: 'John Doe',
-            password: 'Password_123'
-        }
-
-        // WHEN & THEN : On vérifie que l'appel rejette avec le bon message
-        await expect(userService.createUser(userData as any))
-            .rejects.toThrow('Cet email est déjà utilisé');
-    });
 });
 
 describe('UserService -- fetchUsers', () => {
-    let userService: UserService;
-    let mockUserRepository: any;
+        let userService: UserService;
+        let mockUserRepository: any;
 
-    beforeEach(() => {
-        vi.clearAllMocks()
-        mockUserRepository = UserRepository.prototype;
-        userService = new UserService()
-    });
+        beforeEach(() => {
+                vi.clearAllMocks()
+                mockUserRepository = UserRepository.prototype;
+                userService = new UserService(mockUserRepository)
+        });
 
-    it('devrait retourner la liste de tous les utilisateurs', async () => {
-        // GIVEN
-        const mockUsers = [
-            { id: 'user_1', email: 'alice@example.com', name: 'Alice', password: 'hashed_1', createdAt: new Date('2024-01-01') },
-            { id: 'user_2', email: 'bob@example.com', name: 'Bob', password: 'hashed_2', createdAt: new Date('2024-01-02') }
-        ];
-        vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
+        it('devrait retourner la liste de tous les utilisateurs', async () => {
+                const mockUsers = [
+                        { id: 'user_1', email: 'alice@example.com', name: 'Alice', password: 'hashed_1', createdAt: new Date('2024-01-01') },
+                        { id: 'user_2', email: 'bob@example.com', name: 'Bob', password: 'hashed_2', createdAt: new Date('2024-01-02') }
+                ];
+                vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
 
-        // WHEN
-        const result = await userService.fetchUsers();
+                const result = await userService.fetchUsers();
 
-        // THEN
-        expect(result).toHaveLength(2);
-        expect(result[0]).not.toHaveProperty('password');
-        expect(result[1].name).toBe('Bob');
-    });
+                // THEN
+                expect(result).toHaveLength(2);
+                expect(result[0]).not.toHaveProperty('password');
+                expect(result[1].name).toBe('Bob');
+        });
 
-    it('devrait retourner un tableau vide si aucun utilisateur existe', async () => {
-        // GIVEN
-        vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
+        it('devrait retourner un tableau vide si aucun utilisateur existe', async () => {
+                // GIVEN
+                vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
 
-        // WHEN
-        const result = await userService.fetchUsers();
+                // WHEN
+                const result = await userService.fetchUsers();
+                expect(result).toEqual([]);
+        });
 
-        // THEN
-        expect(result).toEqual([]);
-    });
+        it('devrait propager les erreurs du repository', async () => {
+                // GIVEN
+                vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Erreur base de données'));
 
-    it('devrait propager les erreurs du repository', async () => {
-        // GIVEN
-        vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Erreur base de données'));
-
-        // WHEN & THEN
-        await expect(userService.fetchUsers()).rejects.toThrow('Erreur base de données');
-    });
+                // WHEN & THEN
+                await expect(userService.fetchUsers()).rejects.toThrow('Erreur base de données');
+        });
 });
 
 describe('UserService -- fetchUser', () => {
-    let userService: UserService;
-    let mockUserRepository: any;
+        let userService: UserService;
+        let mockUserRepository: any;
 
-    beforeEach(() => {
-        vi.clearAllMocks()
-        mockUserRepository = UserRepository.prototype;
-        userService = new UserService()
-    });
-
-    it('devrait retourner un utilisateur existant par son ID', async () => {
-        // GIVEN
-        const mockUser = {
-            id: 'user_123',
-            email: 'test@example.com',
-            name: 'Test User',
-            password: 'hashed_password',
-            createdAt: new Date('2024-06-01')
-        };
-        vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
-
-        // WHEN
-        const result = await userService.fetchUser('user_123');
-
-        // THEN
-        expect(result).toEqual({
-            id: 'user_123',
-            email: 'test@example.com',
-            name: 'Test User',
-            createdAt: mockUser.createdAt
+        beforeEach(() => {
+                vi.clearAllMocks()
+                mockUserRepository = UserRepository.prototype;
+                userService = new UserService(mockUserRepository)
         });
-    });
 
-    it('ne devrait pas retourner le mot de passe dans la réponse', async () => {
-        // GIVEN
-        const mockUser = {
-            id: 'u1',
-            email: 'u1@test.com',
-            name: 'U1',
-            password: 'SECRET_PASSWORD',
-            createdAt: new Date('2024-03-15')
-        };
-        vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+        it('devrait retourner un utilisateur existant par son ID', async () => {
+                const mockUser = {
+                        id: 'user_123',
+                        email: 'test@example.com',
+                        name: 'Test User',
+                        password: 'hashed_password',
+                        createdAt: new Date('2024-06-01')
+                };
+                vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
 
-        // WHEN
-        const result = await userService.fetchUser('u1');
+                // WHEN
+                const result = await userService.fetchUser('user_123');
 
-        // THEN
-        expect(result).not.toHaveProperty('password');
-    });
+                expect(result).toEqual({
+                        id: 'user_123',
+                        email: 'test@example.com',
+                        name: 'Test User',
+                        createdAt: mockUser.createdAt
+                });
+        });
 
-    it("devrait lever une erreur avec statusCode 404 si l'utilisateur n'existe pas", async () => {
-        // GIVEN : L'ID ne correspond à aucun utilisateur
-        vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
+        it('ne devrait pas retourner le mot de passe dans la réponse', async () => {
+                const mockUser = {
+                        id: 'u1',
+                        email: 'u1@test.com',
+                        name: 'U1',
+                        password: 'SECRET_PASSWORD',
+                        createdAt: new Date('2024-03-15')
+                };
+                vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
 
-        // WHEN & THEN
-        await expect(userService.fetchUser('unknown_id'))
-            .rejects.toThrow("L'utilisateur que vous rechercher n'existe pas !");
-    });
+                // WHEN
+                const result = await userService.fetchUser('u1');
 
-    it("devrait attacher un statusCode 404 à l'erreur quand l'utilisateur n'existe pas", async () => {
-        // GIVEN
-        vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
+                // THEN
+                expect(result).not.toHaveProperty('password');
+        });
 
-        // WHEN
-        try {
-            await userService.fetchUser('unknown_id');
-        } catch (error: any) {
-            // THEN
-            expect(error.statusCode).toBe(404);
-        }
-    });
+        it("devrait lever une erreur avec statusCode 404 si l'utilisateur n'existe pas", async () => {
+                // GIVEN : L'ID ne correspond à aucun utilisateur
+                vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-    it('devrait propager les erreurs du repository', async () => {
-        // GIVEN
-        vi.mocked(mockUserRepository.findById).mockRejectedValue(new Error('DB connection failed'));
+                // WHEN & THEN
+                await expect(userService.fetchUser('unknown_id'))
+                        .rejects.toThrow("L'utilisateur que vous rechercher n'existe pas !");
+        });
 
-        // WHEN & THEN
-        await expect(userService.fetchUser('any_id')).rejects.toThrow('DB connection failed');
-    });
+        it("devrait attacher un statusCode 404 à l'erreur quand l'utilisateur n'existe pas", async () => {
+                // GIVEN
+                vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-    it('devrait appeler findById avec le bon identifiant', async () => {
-        // GIVEN
-        const userId = 'target_id';
-        const mockUser = {
-            id: userId,
-            email: 'target@test.com',
-            name: 'Target',
-            password: 'pass',
-            createdAt: new Date()
-        };
-        vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+                // WHEN & THEN
+                await expect(userService.fetchUser('unknown_id')).rejects.toMatchObject({
+                        message: "L'utilisateur que vous rechercher n'existe pas !",
+                        statusCode: 404
+                });
+        });
 
-        // WHEN
-        await userService.fetchUser(userId);
+        it('devrait propager les erreurs du repository', async () => {
+                // GIVEN
+                vi.mocked(mockUserRepository.findById).mockRejectedValue(new Error('DB connection failed'));
 
-        // THEN
-        expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
-    });
+                // WHEN & THEN
+                await expect(userService.fetchUser('any_id')).rejects.toThrow('DB connection failed');
+        });
+
+        it('devrait appeler findById avec le bon identifiant', async () => {
+                // GIVEN
+                const userId = 'target_id';
+                const mockUser = {
+                        id: userId,
+                        email: 'target@test.com',
+                        name: 'Target',
+                        password: 'pass',
+                        createdAt: new Date()
+                };
+                vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+
+                // WHEN
+                await userService.fetchUser(userId);
+
+                // THEN
+                expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
+        });
 });

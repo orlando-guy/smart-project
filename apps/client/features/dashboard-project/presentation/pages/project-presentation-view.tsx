@@ -51,6 +51,10 @@ export default function ProjectPresentationView() {
                         Créer votre premier projet
                     </Button>
                 </section>
+                <AddProjectModal
+                    open={isAddProjectModalOpen}
+                    onOpenChange={setIsAddProjectModalOpen}
+                />
             </div>
         )
     }

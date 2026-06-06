@@ -21,7 +21,7 @@ export class ProjectService {
         return !!result;
     }
 
-    async createProject(authorId: string, projectData: ProjectInput): Promise<Project> {
+    async createProject(authorId: string, projectData: ProjectInput): Promise<Project | void> {
         const { title } = projectData;
         const existingProject = await this.isExistingProject(title, "title");
 
@@ -38,11 +38,16 @@ export class ProjectService {
             })
 
             return project;
-        } catch (error) {
-            const duplicateError = new Error("Impossible de créer le projet. Une érreur est survenue.");
-            (duplicateError as any).statusCode = 500;
-            console.error(error);
-            throw duplicateError;
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                generateErrorWithStatusCode("Un projet avec ce titre existe déjà", 409);
+            }
+
+            generateErrorWithStatusCode(
+                "Impossible de créer le projet. Une érreur est survenue.",
+                500,
+                error
+            );
         }
     }
 

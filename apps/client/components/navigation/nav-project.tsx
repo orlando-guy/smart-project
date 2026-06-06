@@ -51,7 +51,7 @@ export function NavProjects({
         <SidebarGroupLabel>Projects</SidebarGroupLabel>
         <SidebarMenu>
           {projects.map((item) => (
-            <SidebarMenuItem key={item.name}>
+            <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
                 <a href={item.url}>
                   <item.icon />

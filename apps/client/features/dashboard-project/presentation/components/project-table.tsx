@@ -38,7 +38,7 @@ const ProjectTable = ({ projects }: Readonly<{ projects: Project[] | [] }>) => {
                             <TableCell className="font-medium">{item.titre}</TableCell>
                             <TableCell>{item.id.substring(0, 2)}</TableCell>
                             <TableCell>{item.lead?.name}</TableCell>
-                            <TableCell>{(new Date(item.createdAt).toDateString())}</TableCell>
+                            <TableCell>{new Date(item.createdAt).toLocaleDateString("fr-FR")}</TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>

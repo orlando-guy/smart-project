@@ -77,7 +77,7 @@ model Document {
 
 model Comment {
   id          String   @id @unique @default(uuid())
-  description String
+  description String   @default("")
   createdAt   DateTime @default(now())
   taskId      String
   task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)

@@ -23,28 +23,31 @@ export class ProjectRepository
     }
 
     async getSingleProject(projectId: string): Promise<Project> {
-        const { data: result } = await api.get(`/project/${projectId}`);
+        const result = await api.get(`/project/${projectId}`);
+        const project = result.data?.data ?? result.data?.project ?? result.data;
 
         return new Project(
-            result.data.id,
-            result.data.titre,
-            result.data.description,
-            result.data.leadId,
-            result.data.createdAt,
-            result.data.lead,
-            result.data.teams,
-            result.data.tasks
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId,
+            project.createdAt,
+            project.lead,
+            project.teams,
+            project.tasks
         );
     }
 
     async create(payload: ProjectInput): Promise<Omit<Project, "lead">> {
-        const result = await api.post<Project>('/project/register', payload);
+        const result = await api.post<any>('/project/register', payload);
+        const project = result.data?.data ?? result.data?.project ?? result.data;
+        
         return new Project(
-            result.data.id,
-            result.data.titre,
-            result.data.description,
-            result.data.leadId,
-            result.data.createdAt
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId,
+            project.createdAt
         )
     }
 

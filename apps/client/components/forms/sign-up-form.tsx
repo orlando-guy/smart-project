@@ -33,8 +33,6 @@ export const SignUpForm = () => {
         signupMutation.mutate(formData, {
             onSuccess: async () => {
                 const { email, password } = formData;
-                console.log({ email, password });
-                debugger;
                 // Connecte le nouvel utilisateur
                 loginMutation.mutate({ email, password }, {
                     onSuccess: async (data) => {
