@@ -26,6 +26,7 @@ export class ProjectRepository {
                 id: true,
                 titre: true,
                 description: true,
+                leadId: true,
                 createdAt: true,
                 tasks: {
                     select: {
@@ -113,6 +114,37 @@ export class ProjectRepository {
                 tasks: true,
                 teams: true
             }
+        })
+        }
+
+        // Check if a user is already a member of a project team
+        async isMember(projectId: string, userId: string) {
+        const membership = await this.#prisma.team.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId
+                }
+            }
         });
+        return !!membership;
+        }
+
+        // Add a member to a project team
+        async addMemberToAProject(projectId: string, memberId: string) {
+        return this.#prisma.team.create({
+            data: {
+                project: {
+                    connect: {
+                        id: projectId
+                    }
+                },
+                user: {
+                    connect: {
+                        id: memberId
+                    }
+                }
+            }
+        })
     }
 }

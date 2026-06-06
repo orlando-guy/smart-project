@@ -2,9 +2,14 @@ import { Project } from "@repo/database";
 import { ProjectInput } from "@repo/shared";
 import { generateErrorWithStatusCode } from "src/lib/utils";
 import { ProjectRepository } from "src/repositories/project.repository";
+import { UserRepository } from "src/repositories/user.repository";
 
 export class ProjectService {
-    private readonly projectRepository = new ProjectRepository()
+    constructor(
+        private readonly projectRepository = new ProjectRepository(),
+        private readonly userRepository = new UserRepository()
+    ) {}
+
 
     private async isExistingProject(targert: string, hintTarget: "title" | "id"): Promise<boolean> {
         let result;
@@ -40,7 +45,7 @@ export class ProjectService {
             throw duplicateError;
         }
     }
-    
+
     async listUserProject(userId: string): Promise<Project[]> {
         const projects = await this.projectRepository.findProjectByUserId(userId);
         return projects;
@@ -50,7 +55,7 @@ export class ProjectService {
         try {
             const projectDetail = await this.projectRepository.findById(projectId);
             return projectDetail;
-        } catch(error) {
+        } catch (error) {
             generateErrorWithStatusCode(
                 'Impossible de recupére les données demandés. Une érreur est survenue.',
                 500,
@@ -62,7 +67,7 @@ export class ProjectService {
     async editProject(projectId: string, projectData: ProjectInput) {
         // Vérifier que le projet existe
         const isProjectExists = await this.isExistingProject(projectId, "id");
-    
+
         if (!isProjectExists) {
             generateErrorWithStatusCode(
                 'Le projet que vous voulez éditer n\'existe pas',
@@ -73,7 +78,7 @@ export class ProjectService {
         try {
             const data = await this.projectRepository.edit(projectId, projectData);
             return data;
-        } catch(error) {
+        } catch (error) {
             generateErrorWithStatusCode(
                 'Une érreur innatendue est survenue durant l\'opération',
                 500,
@@ -95,7 +100,53 @@ export class ProjectService {
         try {
             const data = await this.projectRepository.drop(projectId);
             return data;
-        } catch(error) {
+        } catch (error) {
+            generateErrorWithStatusCode(
+                'Une érreur innatendue est survenue durant l\'opération',
+                500,
+                error
+            );
+        }
+    }
+
+    async addMemberToProject(authorId: string, projectId: string, memberId: string) {
+        const project = await this.projectRepository.findById(projectId);
+        if (!project) {
+            generateErrorWithStatusCode(
+                'Le projet auquel vous voulez-y ajouter un membre n\'existe pas',
+                404
+            );
+        }
+
+        // Check permission: only project lead can add members
+        if (project!.leadId !== authorId) {
+            generateErrorWithStatusCode(
+                'Seul le responsable du projet peut ajouter des membres',
+                403
+            );
+        }
+
+        const isUserExists = await this.userRepository.findById(memberId);
+        if (!isUserExists) {
+            generateErrorWithStatusCode(
+                'L\'utilisateur n\'existe pas',
+                404
+            );
+        }
+
+        // Check if user is already a member
+        const isAlreadyMember = await this.projectRepository.isMember(projectId, memberId);
+        if (isAlreadyMember) {
+            generateErrorWithStatusCode(
+                'Cet utilisateur est déjà membre du projet',
+                409
+            );
+        }
+
+        try {
+            const data = await this.projectRepository.addMemberToAProject(projectId, memberId);
+            return data;
+        } catch (error) {
             generateErrorWithStatusCode(
                 'Une érreur innatendue est survenue durant l\'opération',
                 500,

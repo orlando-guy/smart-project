@@ -9,12 +9,14 @@ import { type User, LoginUserInput } from '@repo/shared';
     - Renvoient la réponse HTTP (res.status().json()) avec le bon code d'état
 */
 
-const userService = new UserService()
-
 export class UserController {
+    constructor(
+        private readonly userService = new UserService()
+    ) {}
+
     async register(req: Request<{}, {}, User>, res: Response) {
         // Les données de req.body sont déjà validées et typées grâce au middleware
-        const newUser = await userService.createUser(req.body);
+        const newUser = await this.userService.createUser(req.body);
 
         return res.status(201).json({
             success: true,
@@ -23,7 +25,7 @@ export class UserController {
     }
 
     async login(req: Request<{}, {}, LoginUserInput>, res: Response) {
-        const data = await userService.login(req.body);
+        const data = await this.userService.login(req.body);
         return res.status(200).json({
             success: true,
             data
@@ -40,7 +42,7 @@ export class UserController {
 
     async getSingleUser(req: Request, res: Response) {
         const { id } = req.params;
-        const data = await userService.fetchUser(id as string);
+        const data = await this.userService.fetchUser(id as string);
         return res.status(200).json({
             success: true,
             data
@@ -48,7 +50,7 @@ export class UserController {
     }
 
     async getUsers(req: Request, res: Response) {
-        const data = await userService.fetchUsers();
+        const data = await this.userService.fetchUsers();
         
         return res.status(200).json({
             success: true,

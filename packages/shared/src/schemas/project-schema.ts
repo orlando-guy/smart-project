@@ -8,5 +8,12 @@ export const ProjectSchema = z.object({
     description: z.string().min(MIN_DESCRIPTION_LENGTH, "La description doit avoir au moins" + MIN_DESCRIPTION_LENGTH),
 });
 
+export const AddMemberToProjectSchema = z.object({
+    projectId: z.string(),
+    newMemberId: z.string()
+})
+
+export type AddNewMemberInput = z.infer<typeof AddMemberToProjectSchema>
+
 export type ProjectInput = z.infer<typeof ProjectSchema>
 
