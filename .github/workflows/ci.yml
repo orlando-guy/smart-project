@@ -10,6 +10,12 @@ jobs:
     test_and_build:
         name: Test and Build
         runs-on: ubuntu-latest
+        env:
+            CI: true
+            NODE_ENV: test
+            JWT_SECRET: "a-very-long-secret-for-testing-purposes-only-32-chars"
+            DATABASE_URL: "file:./dev.db"
+            API_PORT: "4000"
 
         steps:
             - name: Checkout Code
@@ -43,12 +49,11 @@ jobs:
             - name: Generate Prisma Client
               run: pnpm run generate
 
+            - name: Push Database Schema
+              run: pnpm --filter @repo/database exec prisma db push --accept-data-loss
+
             - name: Run Tests (Turborepo)
               run: pnpm run test
-              env:
-                  CI: true
-                  JWT_SECRET: "test-secret"
-                  API_PORT: 4000
 
             - name: Build Projects (Turborepo)
               run: pnpm run build
