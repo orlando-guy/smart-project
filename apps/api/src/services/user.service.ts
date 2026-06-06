@@ -22,7 +22,10 @@ type LoginResponse = {
 const JWT_SECRET = env.JWT_SECRET;
 
 export class UserService {
-    private readonly userRepository = new UserRepository()
+    constructor(
+        private readonly userRepository = new UserRepository()
+    ) {}
+
     // Simulation d'une base de données ou d'un ORM (prisma/mogoose)
     async createUser(userData: User): Promise<UserResponse & { password: string }> {
         // Exemple de logique métier (Vérification existence, Hashage du mot de passe...)

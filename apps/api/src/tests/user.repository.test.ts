@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { UserRepository } from '../repositories/user.repository'
 
-// Mock the @repo/database module to avoid real DB connections
-const mockFindMany = vi.fn();
-const mockFindUnique = vi.fn();
-const mockCreate = vi.fn();
+const { mockFindMany, mockFindUnique, mockCreate } = vi.hoisted(() => ({
+    mockFindMany: vi.fn(),
+    mockFindUnique: vi.fn(),
+    mockCreate: vi.fn()
+}));
 
+// Mock the @repo/database module to avoid real DB connections
 vi.mock('@repo/database', () => {
     return {
         getPrisma: vi.fn().mockReturnValue({

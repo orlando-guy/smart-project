@@ -1,4 +1,4 @@
-import { ProjectSchema } from "@repo/shared";
+import { AddMemberToProjectSchema, ProjectSchema } from "@repo/shared";
 import { Router } from "express";
 import { ProjecController } from "src/controllers/project.controller";
 import { requireAuth } from "src/middlewares/auth.middleware";
@@ -36,6 +36,13 @@ projectRoutes.delete(
     requireAuth,
     projectController.deletete
 );
-
+projectRoutes.post(
+    '/project/add-new-member',
+    [
+        processRequest({body: AddMemberToProjectSchema}),
+        requireAuth
+    ],
+    projectController.addNewMember
+);
 
 export default projectRoutes;
