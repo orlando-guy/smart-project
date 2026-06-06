@@ -1,10 +1,8 @@
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-// Charge le fichier .env approprié
-dotenv.config({
-    path: '/Users/orlandoguichard/Documents/LAB/Websites/smart-project/apps/api/.env.local'
-});
+// Charge le fichier .env
+dotenv.config({ path: ['.env.local', '.env'] });
 
 /* 
     Pour éviter que votre API ne démarre avec une variable manquante
@@ -16,7 +14,7 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     API_PORT: z.string().transform((val) => Number.parseInt(val, 10)).default('4000'),
     JWT_SECRET: z.string().min(32, "Le JWT_SECRET doit faire au moins 32 caractères pour être sécurisé"), // openssl rand -base64 32
-    DATABASE_URL: z.string().url("Le DATABASE_URL doit être une URL valide"),
+    DATABASE_URL: z.string().min(1, "Le DATABASE_URL est requis"),
 })
 
 const _env = envSchema.safeParse(process.env);
