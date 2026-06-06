@@ -8,11 +8,10 @@ import Image from "next/image"; import { Field, FieldError, FieldGroup, FieldLab
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { useSignupMutation } from "@/hooks/use-auth-mutations";
+import { useSignupMutation, useLoginMutation } from "@/hooks/use-auth-mutations";
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { loginAndRedirect } from "@/lib/auth-util";
-import { useLoginMutation } from "@/hooks/use-auth-mutations";
 
 export const SignUpForm = () => {
     const router = useRouter();
@@ -34,8 +33,6 @@ export const SignUpForm = () => {
         signupMutation.mutate(formData, {
             onSuccess: async () => {
                 const { email, password } = formData;
-                console.log({ email, password });
-                debugger;
                 // Connecte le nouvel utilisateur
                 loginMutation.mutate({ email, password }, {
                     onSuccess: async (data) => {

@@ -3,8 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import userRoutes from './routes/user.routes';
 import { errorHandler } from './middlewares/error.middleware';
+import projectRoutes from './routes/project.routes';
 
 const app = express();
+const API_BASE_PATH = '/api' as const;
 
 app.disable('x-powered-by');
 
@@ -37,7 +39,8 @@ app.get('/', (req, res) => {
 })
 
 // Déclaration des routes de l'API
-app.use('/api/users', userRoutes);
+app.use(`${API_BASE_PATH}/users`, userRoutes);
+app.use(API_BASE_PATH, projectRoutes);
 
 // Le middleware d'erreur doit TOUJOURS être enregistré en dernier
 app.use(errorHandler);

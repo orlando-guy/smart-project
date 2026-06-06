@@ -8,19 +8,19 @@ const { mockFetchUsers, mockFetchUser, mockCreateUser, mockLogin } = vi.hoisted(
     mockLogin: vi.fn()
 }));
 
-vi.mock('../services/user.service', () => {
+vi.mock('src/services/user.service', () => {
     return {
-        UserService: vi.fn().mockImplementation(() => ({
-            createUser: mockCreateUser,
-            login: mockLogin,
-            fetchUsers: mockFetchUsers,
-            fetchUser: mockFetchUser
-        }))
+        UserService: class {
+            createUser = mockCreateUser;
+            login = mockLogin;
+            fetchUsers = mockFetchUsers;
+            fetchUser = mockFetchUser;
+        }
     };
 });
 
 // Import after mock setup
-const { UserController } = await import('../controllers/user.controller');
+import { UserController } from 'src/controllers/user.controller';
 
 // Helper to create mock Express request
 const createMockReq = (overrides: Record<string, any> = {}) => ({

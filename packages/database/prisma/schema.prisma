@@ -13,83 +13,84 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) @unique
-  email     String   @unique
-  name      String
-  role      Role     @default(USER)
-  password  String
-  createdAt DateTime @default(now())
-  project   Project[]
-  teams Team[]
-  tasks Task[]
-  documents Document[]
-  comments Comment[]
+  id           String         @id @unique @default(uuid())
+  email        String         @unique
+  name         String
+  role         Role           @default(USER)
+  password     String
+  createdAt    DateTime       @default(now())
+  project      Project[]
+  teams        Team[]
+  tasks        Task[]
+  documents    Document[]
+  comments     Comment[]
   notification Notification[]
 }
 
 model Project {
-  id          String   @id @default(uuid()) @unique
+  id          String   @id @unique @default(uuid())
   titre       String   @unique
   description String
   createdAt   DateTime @default(now())
   leadId      String
   lead        User     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
-  teams Team[]
-  tasks Task[]
+  teams     Team[]
+  tasks     Task[]
   documents Document[]
 }
 
 model Team {
   projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([projectId, userId])
 }
 
 model Task {
-  id String @id @default(uuid()) @unique
-  title String @unique
-  description String?
-  endDate DateTime?
-  priority ProjectPriority
-  statut TaskStatus @default(NOT_STARTED)
-  projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id             String          @id @unique @default(uuid())
+  title          String          @unique
+  description    String?
+  endDate        DateTime?
+  priority       ProjectPriority
+  statut         TaskStatus      @default(NOT_STARTED)
+  projectId      String
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assignedUserId String
-  assignedUser User @relation(fields: [assignedUserId], references: [id], onDelete: Cascade)
+  assignedUser   User            @relation(fields: [assignedUserId], references: [id], onDelete: Cascade)
 
   comments Comment[]
 }
 
 model Document {
-  id String @id @default(uuid()) @unique
-  fileName String
-  type DocumentTypes
-  uploadDate DateTime @default(now())
-  projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  authorId String
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id         String        @id @unique @default(uuid())
+  fileName   String
+  type       DocumentTypes
+  uploadDate DateTime      @default(now())
+  projectId  String
+  project    Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
-  id String @id @default(uuid()) @unique
+  id          String   @id @unique @default(uuid())
+  description String   @default("")
   createdAt   DateTime @default(now())
-  taskId String
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  authorId String
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
-  id String @id @default(uuid()) @unique
-  message String
-  createdAt   DateTime @default(now())
+  id             String   @id @unique @default(uuid())
+  message        String
+  createdAt      DateTime @default(now())
   targetedUserId String
-  targetedUser User @relation(fields: [targetedUserId], references: [id], onDelete: Cascade)
+  targetedUser   User     @relation(fields: [targetedUserId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
