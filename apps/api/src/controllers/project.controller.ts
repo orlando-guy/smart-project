@@ -12,7 +12,7 @@ export class ProjecController {
         private readonly projectService = new ProjectService()
     ) {}
 
-    async register(req: Request<{}, {}, ProjectInput>, res: Response) {
+    register = async (req: Request<{}, {}, ProjectInput>, res: Response) => {
         const newProject = await this.projectService.createProject(req.user.id, req.body);
 
         return res.status(201).json({
@@ -21,7 +21,7 @@ export class ProjecController {
         })
     }
 
-    async allUserProjects(req: Request, res: Response) {
+    allUserProjects = async (req: Request, res: Response) => {
         const data = await this.projectService.listUserProject(req.user.id);
         return res.status(200).json({
             success: true,
@@ -29,7 +29,7 @@ export class ProjecController {
         })
     }
 
-    async getProjectDetail(req: Request, res: Response) {
+    getProjectDetail = async (req: Request, res: Response) => {
         const { id } = req.params;
         const data = await this.projectService.fetchProjectDetail(id as string);
 
@@ -39,7 +39,7 @@ export class ProjecController {
         })
     }
 
-    async update(req: Request<{ id: string }, {}, ProjectInput>, res: Response) {
+    update = async (req: Request<{ id: string }, {}, ProjectInput>, res: Response) => {
         const data = await this.projectService.editProject(req.params.id as string, req.body);
 
         return res.status(200).json({
@@ -48,7 +48,7 @@ export class ProjecController {
         })
     }
 
-    async deletete(req: Request, res: Response) {
+    deletete = async (req: Request, res: Response) => {
         const data = await this.projectService.deleteProject(req.params.id as string);
 
         return res.status(200).json({
@@ -57,7 +57,7 @@ export class ProjecController {
         })
     }
 
-    async addNewMember(req: Request<{}, {}, AddNewMemberInput>, res: Response) {
+    addNewMember = async (req: Request<{}, {}, AddNewMemberInput>, res: Response) => {
         const data = await this.projectService.addMemberToProject(req.user.id, req.body.projectId, req.body.newMemberId);
 
         return res.status(201).json({
