@@ -2,13 +2,17 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env"], 
   "tasks": {
+    "generate": {
+      "cache": true,
+      "outputs": ["packages/database/generated/**"]
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "outputs": [".next/**", "dist/**"],
       "env": ["NODE_ENV", "API_PORT", "JWT_SECRET", "DATABASE_URL", "FRONTEND_URL"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "inputs": ["src/**/*.ts", "src/**/*.test.ts"]
     },
     "dev": {
