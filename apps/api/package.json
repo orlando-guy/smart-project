@@ -7,6 +7,7 @@
     "dev": "cross-env API_PORT=4000 tsx watch --tsconfig ./tsconfig.json src/app.ts",
     "build": "tsc",
     "test": "vitest run",
+    "start": "node dist/app.ts",
     "test:watch": "vitest"
   },
   "devDependencies": {
