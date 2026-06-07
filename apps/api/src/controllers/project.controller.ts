@@ -71,4 +71,13 @@ export class ProjecController {
 
         return res.status(200).json(data);
     }
+
+    getProjectMembers = async (req: Request, res: Response) => {
+        const data = await this.projectService.getProjectMembers(req.params.id as string);
+
+        return res.status(200).json({
+            success: true,
+            data
+        });
+    }
 }

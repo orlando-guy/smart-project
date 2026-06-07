@@ -200,4 +200,25 @@ export class ProjectService {
             );
         }
     }
+
+    async getProjectMembers(projectId: string) {
+        const isProjectExists = await this.isExistingProject(projectId, 'id');
+        if (!isProjectExists) {
+            generateErrorWithStatusCode(
+                'Le projet demandé n\'existe pas',
+                404
+            );
+        }
+
+        try {
+            const members = await this.projectRepository.getMembers(projectId);
+            return members.map(m => m.user);
+        } catch (error) {
+            generateErrorWithStatusCode(
+                'Une érreur innatendue est survenue durant l\'opération',
+                500,
+                error
+            );
+        }
+    }
 }
