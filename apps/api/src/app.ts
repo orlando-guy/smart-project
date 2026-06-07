@@ -4,6 +4,7 @@ import cors from 'cors';
 import userRoutes from './routes/user.routes';
 import { errorHandler } from './middlewares/error.middleware';
 import projectRoutes from './routes/project.routes';
+import taskRoutes from './routes/task.routes';
 import swaggerRouter from './middlewares/swagger.middleware';
 
 const app = express();
@@ -45,6 +46,7 @@ app.get('/', (req, res) => {
 // Déclaration des routes de l'API
 app.use(`${API_BASE_PATH}/users`, userRoutes);
 app.use(API_BASE_PATH, projectRoutes);
+app.use(API_BASE_PATH, taskRoutes);
 
 // Le middleware d'erreur doit TOUJOURS être enregistré en dernier
 app.use(errorHandler);

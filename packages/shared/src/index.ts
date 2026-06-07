@@ -1,6 +1,8 @@
 import { z } from 'zod';
 export * from './schemas/project-schema';
 export * from './schemas/user-schema';
+export * from './schemas/task-schema';
+export * from './constants';
 
 export const CourseSchema = z.object({
   id: z.number().nullish(),

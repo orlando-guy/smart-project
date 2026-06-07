@@ -1,0 +1,59 @@
+import { TaskSchema } from "@repo/shared";
+import { Router } from "express";
+import { TaskController } from "src/controllers/task.controller";
+import { requireAuth } from "src/middlewares/auth.middleware";
+import { processRequest } from "zod-express-middleware";
+
+const taskRoutes: Router = Router();
+const taskController = new TaskController();
+
+/**
+ * @openapi
+ * /task/create:
+ *   post:
+ *     summary: Create a new task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, projectId, assignedUserId, priority]
+ *             properties:
+ *               title: { type: string, example: "Finish API docs" }
+ *               description: { type: string, example: "Write down swagger docs for tasks" }
+ *               endDate: { type: string, format: date-time, example: "2026-06-10T00:00:00Z" }
+ *               priority: { type: string, enum: [MUST, SHOULD, COULD, WONT] }
+ *               statut: { type: string, enum: [ACHIEVED, ONGOING, NOT_STARTED] }
+ *               projectId: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
+ *               assignedUserId: { type: string, example: "user-123" }
+ *     responses:
+ *       201:
+ *         description: Task created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { type: object }
+ *       400:
+ *         $ref: '#/components/responses/StandardError'
+ *       401:
+ *         $ref: '#/components/responses/StandardError'
+ *       404:
+ *         $ref: '#/components/responses/StandardError'
+ */
+taskRoutes.post(
+    '/task/create',
+    [
+        requireAuth,
+        processRequest({ body: TaskSchema }),
+    ],
+    taskController.create
+);
+
+export default taskRoutes;
