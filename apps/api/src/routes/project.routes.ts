@@ -48,4 +48,13 @@ projectRoutes.post(
     projectController.addNewMember
 );
 
+projectRoutes.post(
+    '/project/remove-member',
+    [
+        processRequest({body: AddMemberToProjectSchema}),
+        requireAuth
+    ],
+    projectController.removeMember
+);
+
 export default projectRoutes;

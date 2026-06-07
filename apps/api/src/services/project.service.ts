@@ -159,4 +159,50 @@ export class ProjectService {
             );
         }
     }
+
+    async removeMemberFromProject(authorId: string, projectId: string, memberId: string) {
+        const project = await this.projectRepository.findById(projectId);
+        if (!project) {
+            generateErrorWithStatusCode(
+                'Le projet auquel vous voulez retirer un membre n\'existe pas',
+                404
+            );
+        }
+
+        // Check permission: only project lead can remove members
+        if (project!.leadId !== authorId) {
+            generateErrorWithStatusCode(
+                'Seul le responsable du projet peut retirer des membres',
+                403
+            );
+        }
+
+        const isUserExists = await this.userRepository.findById(memberId);
+        if (!isUserExists) {
+            generateErrorWithStatusCode(
+                'L\'utilisateur n\'existe pas',
+                404
+            );
+        }
+
+        // Check if user is actually a member
+        const isMember = await this.projectRepository.isMember(projectId, memberId);
+        if (!isMember) {
+            generateErrorWithStatusCode(
+                'Cet utilisateur n\'est pas membre du projet',
+                404
+            );
+        }
+
+        try {
+            await this.projectRepository.removeMemberFromProject(projectId, memberId);
+            return { success: true, message: 'Membre retiré avec succès' };
+        } catch (error) {
+            generateErrorWithStatusCode(
+                'Une érreur innatendue est survenue durant l\'opération',
+                500,
+                error
+            );
+        }
+    }
 }
