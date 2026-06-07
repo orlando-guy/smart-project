@@ -65,4 +65,10 @@ export class ProjecController {
             data
         });
     }
+
+    removeMember = async (req: Request<{}, {}, AddNewMemberInput>, res: Response) => {
+        const data = await this.projectService.removeMemberFromProject(req.user.id, req.body.projectId, req.body.newMemberId);
+
+        return res.status(200).json(data);
+    }
 }

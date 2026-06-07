@@ -147,4 +147,16 @@ export class ProjectRepository {
             }
         })
     }
+
+    // Remove a member from a project team
+    async removeMemberFromProject(projectId: string, memberId: string) {
+        return this.#prisma.team.delete({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: memberId
+                }
+            }
+        })
+    }
 }
