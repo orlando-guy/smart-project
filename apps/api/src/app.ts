@@ -4,6 +4,7 @@ import cors from 'cors';
 import userRoutes from './routes/user.routes';
 import { errorHandler } from './middlewares/error.middleware';
 import projectRoutes from './routes/project.routes';
+import swaggerRouter from './middlewares/swagger.middleware';
 
 const app = express();
 const API_BASE_PATH = '/api' as const;
@@ -33,6 +34,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Injection de la documentation Swagger
+app.use('/docs', swaggerRouter);
 
 app.get('/', (req, res) => {
     res.send("Bienvenue sur l'API de Smart-project");
