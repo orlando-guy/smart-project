@@ -159,4 +159,22 @@ export class ProjectRepository {
             }
         })
     }
+
+    // Get members of a project
+    async getMembers(projectId: string) {
+        return this.#prisma.team.findMany({
+            where: {
+                projectId
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+    }
 }

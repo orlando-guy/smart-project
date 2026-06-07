@@ -57,4 +57,10 @@ projectRoutes.post(
     projectController.removeMember
 );
 
+projectRoutes.get(
+    '/project/:id/members',
+    requireAuth,
+    projectController.getProjectMembers
+);
+
 export default projectRoutes;
