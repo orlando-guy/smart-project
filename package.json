@@ -6,7 +6,8 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "generate": "turbo generate"
+    "generate": "turbo generate",
+    "build:api": "turbo run build --filter=api"
   },
   "workspaces": [
     "apps/*",
