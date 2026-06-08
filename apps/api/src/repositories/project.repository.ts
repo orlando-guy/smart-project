@@ -13,7 +13,7 @@ export class ProjectRepository {
         return this.#prisma.project.create({
             data: {
                 titre: projectData.title,
-                description: projectData.description,
+                description: projectData.description ?? "",
                 leadId: projectData.authorId
             }
         })
@@ -100,7 +100,7 @@ export class ProjectRepository {
             where: {id},
             data: {
                 titre: editProjectData.title,
-                description: editProjectData.description
+                description: editProjectData.description ?? ""
             }
         })
     }

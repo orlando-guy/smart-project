@@ -7,7 +7,6 @@ import { getProjectUseCase } from "../../di/project.container"
 export function useProjects() {
     const query = new QueryBuilder()
         .paginate(1, 10)
-        .search('Lafia')
     
         return useQuery({
             queryKey: ['projects', query.build()],

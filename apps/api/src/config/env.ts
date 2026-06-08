@@ -2,9 +2,8 @@ import dotenv from 'dotenv';
 import { z } from 'zod';
 
 // Charge le fichier .env approprié
-dotenv.config({
-    path: '/Users/orlandoguichard/Documents/LAB/Websites/smart-project/apps/api/.env.local'
-});
+dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 /* 
     Pour éviter que votre API ne démarre avec une variable manquante

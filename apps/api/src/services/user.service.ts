@@ -25,8 +25,13 @@ export class UserService {
     private readonly userRepository = new UserRepository()
     // Simulation d'une base de données ou d'un ORM (prisma/mogoose)
     async createUser(userData: User): Promise<UserResponse & { password: string }> {
+        const normalizedUserData = {
+            ...userData,
+            name: userData.name.trim(),
+            email: userData.email.trim().toLowerCase(),
+        };
         // Exemple de logique métier (Vérification existence, Hashage du mot de passe...)
-        const existingUser = await this.userRepository.findByEmail(userData.email)
+        const existingUser = await this.userRepository.findByEmail(normalizedUserData.email)
 
         if (existingUser) {
             const duplicateError = new Error('Cet email est déjà utilisé') as Error & {
@@ -37,10 +42,10 @@ export class UserService {
             throw duplicateError;
         }
 
-        const hashedPassword = await bcrypt.hash(userData.password, 10)
+        const hashedPassword = await bcrypt.hash(normalizedUserData.password, 10)
 
         const user = await this.userRepository.create({
-            ...userData,
+            ...normalizedUserData,
             hashedPassword
         })
 
@@ -48,20 +53,25 @@ export class UserService {
             id: user.id,
             name: user.name,
             email: user.email,
-            password: userData.password,
+            password: normalizedUserData.password,
             createdAt: user.createdAt
         }
     }
 
     async login(data: LoginUserInput): Promise<LoginResponse> {
-        const user = await this.userRepository.findByEmail(data.email);
+        const normalizedLoginData = {
+            ...data,
+            email: data.email.trim().toLowerCase(),
+        };
+
+        const user = await this.userRepository.findByEmail(normalizedLoginData.email);
         if (!user) {
             const error = new Error('E-mail ou mot de passe invalide');
             (error as any).statusCode = 422;
             throw error;
         }
 
-        const isPasswordValid = await bcrypt.compare(data.password, user.password);
+        const isPasswordValid = await bcrypt.compare(normalizedLoginData.password, user.password);
         if (!isPasswordValid) {
             const error = new Error('E-mail ou mot de passe invalide');
             (error as any).statusCode = 422;

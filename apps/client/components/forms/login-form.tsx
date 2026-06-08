@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useLoginMutation } from "@/hooks/use-auth-mutations";
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { loginAndRedirect } from "@/lib/auth-util";
+import { clearAuthSession, loginAndRedirect } from "@/lib/auth-util";
 
 
 export const LoginForm = () => {
@@ -31,7 +31,13 @@ export const LoginForm = () => {
     const loginMutation = useLoginMutation();
 
     function onSubmit(data: LoginUserInput) {
-        loginMutation.mutate(data, {
+        form.clearErrors("root");
+        clearAuthSession();
+
+        loginMutation.mutate({
+            email: data.email.trim().toLowerCase(),
+            password: data.password,
+        }, {
             onSuccess: async (data) => {
                 // Met à jour l'état en mémoire
                 const { token, user } = data.data;
@@ -39,7 +45,7 @@ export const LoginForm = () => {
             },
             onError: (error) => {
                 if (axios.isAxiosError(error)) {
-                    const apiErrorMessage = error.response?.data?.message || 'Une erreur est survenue';
+                    const apiErrorMessage = error.response?.data?.message || 'Connexion impossible. Verifiez votre e-mail et votre mot de passe.';
                     form.setError('root', { type: 'server', message: apiErrorMessage });
                 } else {
                     form.setError('root', { type: 'server', message: 'Une erreur inattendue est survenue (réseau)' });
@@ -95,6 +101,7 @@ export const LoginForm = () => {
                                         className="min-h-10 focus-visible:ring-(--purple)"
                                         required
                                         autoComplete="on"
+                                        onBlur={(event) => field.onChange(event.target.value.trim().toLowerCase())}
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />

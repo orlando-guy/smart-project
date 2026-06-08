@@ -10,11 +10,11 @@ export function useCreateProject() {
         mutationFn: (payload: CreateProjectDto) => createProjectUseCase.execute(payload),
         onSuccess: (newProject) => {
             // Mise à jour immédiate (Optimistic update)
-            queryClient.setQueryData(
-                ["projects"],
-                (oldData: Project[] = []) => [
+            queryClient.setQueriesData<Project[]>(
+                { queryKey: ["projects"] },
+                (oldData = []) => [
                     ...oldData,
-                    newProject
+                    newProject as Project
                 ]
             )
 

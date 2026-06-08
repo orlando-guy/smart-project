@@ -16,6 +16,15 @@ projectRoutes.post(
     projectController.register
 );
 
+projectRoutes.post(
+    '/projects',
+    [
+        processRequest({body: ProjectSchema}),
+        requireAuth
+    ],
+    projectController.register
+);
+
 projectRoutes.get(
     '/projects',
     requireAuth,

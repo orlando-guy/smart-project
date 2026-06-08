@@ -50,7 +50,7 @@ const ProjectTable = ({ projects }: Readonly<{ projects: Project[] | [] }>) => {
                                     <DropdownMenuContent align="end" className="w-48 rounded-lg">
                                         <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/dashboard/project/${item.id}`)}>
                                             <Folder className="mr-2 h-4 w-4 text-muted-foreground" />
-                                            <span>View Project</span>
+                                            <span>Voir le detail du projet</span>
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem 
@@ -58,7 +58,7 @@ const ProjectTable = ({ projects }: Readonly<{ projects: Project[] | [] }>) => {
                                             onClick={() => setProjectToDelete({ id: item.id, titre: item.titre })}
                                         >
                                             <Trash2 className="mr-2 h-4 w-4" />
-                                            <span>Delete Project</span>
+                                            <span>Supprimer le projet</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

@@ -2,15 +2,14 @@
 
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { AddProjectModal } from "../components/modals/add-project-modal"
-import React, { useState } from "react"
 import { useProjects } from "../../application/hooks/useProjects"
 import ProjectTable from "../components/project-table"
 import { Project } from "../../domain/entities/Project"
 import ProjectTableSkeleton from "../components/skeletons/project-table-skeleton"
+import { useProjectCreateModalStore } from "@/store/useProjectCreateModalStore"
 
 export default function ProjectPresentationView() {
-    const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false)
+    const openCreateProjectModal = useProjectCreateModalStore((state) => state.open)
     const {
         data,
         isLoading,
@@ -31,24 +30,26 @@ export default function ProjectPresentationView() {
 
     if (data !== undefined && data.length === 0) {
         return (
-            <div className="container w-full h-full flex items-center justify-center">
+            <div className="container flex h-full w-full items-center justify-center">
                 <section className="flex flex-col gap-6">
                     <Image
                         src="/remote-management.png"
-                        alt="a remote worker managing is remote work"
+                        alt="a remote worker managing remote work"
                         width={1500}
                         height={1500}
                         className="w-3xs h-auto"
                     />
                     <div className="text-center">
-                        <h2 className="font-bold text-2xl">Aucun projet</h2>
-                        <p className="text-base font-normal mt-4">Vous n&apos;avez encore créer aucun projet !</p>
+                        <h2 className="text-2xl font-bold">Aucun projet</h2>
+                        <p className="mt-4 text-base font-normal">
+                            Vous n&apos;avez encore cree aucun projet !
+                        </p>
                     </div>
                     <Button
                         className="cursor-pointer py-6"
-                        onClick={() => setIsAddProjectModalOpen(true)}
+                        onClick={openCreateProjectModal}
                     >
-                        Créer votre premier projet
+                        Creer votre premier projet
                     </Button>
                 </section>
             </div>
@@ -57,14 +58,7 @@ export default function ProjectPresentationView() {
 
     return (
         <div className="container px-4 md:px-6">
-            <ProjectTable
-                projects={data as Project[]}
-            />
-
-            <AddProjectModal
-                open={isAddProjectModalOpen}
-                onOpenChange={setIsAddProjectModalOpen}
-            />
+            <ProjectTable projects={data as Project[]} />
         </div>
     )
 }

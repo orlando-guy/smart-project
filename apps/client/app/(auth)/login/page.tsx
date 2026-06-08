@@ -1,11 +1,14 @@
 import { LoginForm } from "@/components/forms/login-form"
 import Image from "next/image"
+import { Suspense } from "react"
 
 export default function SingInPage() {
     return (
         <main className="container bg-[#FAFBFC] max-w-screen max-h-screen overflow-hidden">
             <div className="w-full h-full flex items-center justify-center">
-                <LoginForm />
+                <Suspense>
+                    <LoginForm />
+                </Suspense>
                 <div className="absolute bottom-0 left-0 hidden md:inline-block">
                     <Image
                         src="/default_left.558fbf68.svg"

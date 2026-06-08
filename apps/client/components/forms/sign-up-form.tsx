@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useSignupMutation, useLoginMutation } from "@/hooks/use-auth-mutations";
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { loginAndRedirect } from "@/lib/auth-util";
+import { clearAuthSession, loginAndRedirect } from "@/lib/auth-util";
 
 export const SignUpForm = () => {
     const router = useRouter();
@@ -30,11 +30,18 @@ export const SignUpForm = () => {
     const loginMutation = useLoginMutation();
 
     function onSubmit(formData: RegisterUserInput) {
-        signupMutation.mutate(formData, {
+        form.clearErrors("root");
+        clearAuthSession();
+
+        const normalizedFormData = {
+            ...formData,
+            name: formData.name.trim(),
+            email: formData.email.trim().toLowerCase(),
+        };
+
+        signupMutation.mutate(normalizedFormData, {
             onSuccess: async () => {
-                const { email, password } = formData;
-                console.log({ email, password });
-                debugger;
+                const { email, password } = normalizedFormData;
                 // Connecte le nouvel utilisateur
                 loginMutation.mutate({ email, password }, {
                     onSuccess: async (data) => {
@@ -48,7 +55,7 @@ export const SignUpForm = () => {
             },
             onError: (error) => {
                 if (axios.isAxiosError(error)) {
-                    const apiErrorMessage = error.response?.data?.message || 'Une erreur est survenue';
+                    const apiErrorMessage = error.response?.data?.message || 'Inscription impossible. Verifiez les informations saisies.';
                     form.setError('root', { type: 'server', message: apiErrorMessage });
                 } else {
                     form.setError('root', { type: 'server', message: 'Une erreur inattendue est survenue (réseau)' });
@@ -98,6 +105,7 @@ export const SignUpForm = () => {
                                         className="min-h-10 focus-visible:ring-(--purple)"
                                         required
                                         autoComplete="on"
+                                        onBlur={(event) => field.onChange(event.target.value.trim())}
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -123,6 +131,7 @@ export const SignUpForm = () => {
                                         className="min-h-10 focus-visible:ring-(--purple)"
                                         required
                                         autoComplete="on"
+                                        onBlur={(event) => field.onChange(event.target.value.trim().toLowerCase())}
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />

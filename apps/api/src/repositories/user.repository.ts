@@ -7,7 +7,7 @@ export class UserRepository {
     // Trouver un utiisateur par son email
     async findByEmail(email: string): Promise<User | null> {
         return this.#prisma.user.findUnique({
-            where: { email: email }
+            where: { email: email.trim().toLowerCase() }
         })
     }
 
@@ -22,8 +22,8 @@ export class UserRepository {
     async create(userData: UserType & { hashedPassword: string }): Promise<User> {
         return this.#prisma.user.create({
             data: {
-                email: userData.email,
-                name: userData.name,
+                email: userData.email.trim().toLowerCase(),
+                name: userData.name.trim(),
                 password: userData.hashedPassword
             }
         })

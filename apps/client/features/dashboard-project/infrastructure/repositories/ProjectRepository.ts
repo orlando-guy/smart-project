@@ -24,31 +24,60 @@ export class ProjectRepository
 
     async getSingleProject(projectId: string): Promise<Project> {
         const { data: result } = await api.get(`/project/${projectId}`);
+        const project = result.data;
 
         return new Project(
-            result.data.id,
-            result.data.titre,
-            result.data.description,
-            result.data.leadId,
-            result.data.createdAt,
-            result.data.lead,
-            result.data.teams,
-            result.data.tasks
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId ?? null,
+            project.createdAt,
+            project.lead,
+            project.teams ?? [],
+            project.tasks ?? []
         );
     }
 
     async create(payload: ProjectInput): Promise<Omit<Project, "lead">> {
-        const result = await api.post<Project>('/project/register', payload);
+        const result = await api.post<{ data: Project }>('/projects', {
+            ...payload,
+            description: payload.description ?? "",
+        });
+        const project = result.data.data;
+
         return new Project(
-            result.data.id,
-            result.data.titre,
-            result.data.description,
-            result.data.leadId,
-            result.data.createdAt
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId,
+            project.createdAt
+        )
+    }
+
+    async update(id: string, payload: ProjectInput): Promise<Project> {
+        const result = await api.put<{ data: Project }>(`/project/${id}`, {
+            ...payload,
+            description: payload.description ?? "",
+        });
+        const project = result.data.data;
+
+        return new Project(
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId,
+            project.createdAt,
+            project.lead,
+            project.teams ?? [],
+            project.tasks ?? []
         )
     }
 
     async delete(id: string): Promise<void> {
         await api.delete(`/project/${id}`);
+    }
+
+    async inviteMember(projectId: string, userId: string): Promise<void> {
+        await api.post(`/project/${projectId}/members`, { userId });
     }
 }

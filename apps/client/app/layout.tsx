@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/query-provider";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-})
 
 export const metadata: Metadata = {
   title: "Smart Project",
@@ -21,7 +15,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.className} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>{children}</QueryProvider>
