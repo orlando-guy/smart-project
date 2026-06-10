@@ -11,4 +11,7 @@ export const TaskSchema = z.object({
   assignedUserId: z.string().uuid(),
 });
 
+export const UpdateTaskSchema = TaskSchema.partial().omit({ projectId: true });
+
 export type TaskInput = z.infer<typeof TaskSchema>;
+export type UpdateTaskInput = z.infer<typeof UpdateTaskSchema>;
