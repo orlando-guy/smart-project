@@ -32,4 +32,15 @@ export class TaskController {
             data: updatedTask
         });
     }
+
+    updateStatus = async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const { statut } = req.body;
+        const updatedTask = await this.taskService.updateTaskStatus(id as string, req.user.id, statut);
+
+        return res.status(200).json({
+            success: true,
+            data: updatedTask
+        });
+    }
 }

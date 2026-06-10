@@ -197,4 +197,25 @@ describe('TaskService', () => {
             await expect(call).rejects.toThrow("Vous n'avez pas la permission de modifier cette tâche");
         });
     });
+
+    describe('updateTaskStatus', () => {
+        it('should update status successfully if user is assigned', async () => {
+            const taskId = 'tid';
+            const userId = 'assigned_id';
+            const newStatus = TaskStatus.ONGOING;
+
+            vi.mocked(mockTaskRepo.findById).mockResolvedValue({
+                id: taskId,
+                projectId: 'pid',
+                assignedUserId: userId,
+                project: { leadId: 'lead_id' }
+            });
+            vi.mocked(mockTaskRepo.update).mockResolvedValue({ id: taskId, statut: newStatus });
+
+            const result = await taskService.updateTaskStatus(taskId, userId, newStatus);
+
+            expect(result.statut).toBe(newStatus);
+            expect(mockTaskRepo.update).toHaveBeenCalledWith(taskId, { statut: newStatus });
+        });
+    });
 });
