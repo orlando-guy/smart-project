@@ -56,4 +56,40 @@ taskRoutes.post(
     taskController.create
 );
 
+/**
+ * @openapi
+ * /task/{id}:
+ *   delete:
+ *     summary: Delete a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
+ *     responses:
+ *       200:
+ *         description: Task deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: "Tâche supprimée avec succès" }
+ *       401:
+ *         $ref: '#/components/responses/StandardError'
+ *       403:
+ *         $ref: '#/components/responses/StandardError'
+ *       404:
+ *         $ref: '#/components/responses/StandardError'
+ */
+taskRoutes.delete(
+    '/task/:id',
+    requireAuth,
+    taskController.delete
+);
+
 export default taskRoutes;

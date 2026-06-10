@@ -41,4 +41,31 @@ export class TaskService {
             );
         }
     }
+
+    async deleteTask(taskId: string, userId: string) {
+        const task = await this.taskRepository.findById(taskId);
+
+        if (!task) {
+            generateErrorWithStatusCode("La tâche que vous voulez supprimer n'existe pas", 404);
+        }
+
+        // Seul le responsable du projet ou la personne assignée peut supprimer la tâche
+        const isLead = task!.project.leadId === userId;
+        const isAssigned = task!.assignedUserId === userId;
+
+        if (!isLead && !isAssigned) {
+            generateErrorWithStatusCode("Vous n'avez pas la permission de supprimer cette tâche", 403);
+        }
+
+        try {
+            await this.taskRepository.delete(taskId);
+            return { success: true, message: "Tâche supprimée avec succès" };
+        } catch (error) {
+            generateErrorWithStatusCode(
+                "Impossible de supprimer la tâche. Une erreur est survenue.",
+                500,
+                error
+            );
+        }
+    }
 }

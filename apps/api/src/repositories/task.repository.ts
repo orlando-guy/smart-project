@@ -17,4 +17,23 @@ export class TaskRepository {
             },
         });
     }
+
+    async findById(id: string) {
+        return this.#prisma.task.findUnique({
+            where: { id },
+            include: {
+                project: {
+                    select: {
+                        leadId: true
+                    }
+                }
+            }
+        });
+    }
+
+    async delete(id: string) {
+        return this.#prisma.task.delete({
+            where: { id }
+        });
+    }
 }
