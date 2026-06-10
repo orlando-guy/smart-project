@@ -1,4 +1,4 @@
-import { TaskSchema } from "@repo/shared";
+import { TaskSchema, UpdateTaskSchema } from "@repo/shared";
 import { Router } from "express";
 import { TaskController } from "src/controllers/task.controller";
 import { requireAuth } from "src/middlewares/auth.middleware";
@@ -90,6 +90,60 @@ taskRoutes.delete(
     '/task/:id',
     requireAuth,
     taskController.delete
+);
+
+/**
+ * @openapi
+ * /task/{id}:
+ *   put:
+ *     summary: Update a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string, example: "Updated Task Title" }
+ *               description: { type: string, example: "Updated Description" }
+ *               endDate: { type: string, format: date-time, example: "2026-06-15T00:00:00Z" }
+ *               priority: { type: string, enum: [MUST, SHOULD, COULD, WONT] }
+ *               statut: { type: string, enum: [ACHIEVED, ONGOING, NOT_STARTED] }
+ *               assignedUserId: { type: string, example: "user-456" }
+ *     responses:
+ *       200:
+ *         description: Task updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { type: object }
+ *       400:
+ *         $ref: '#/components/responses/StandardError'
+ *       401:
+ *         $ref: '#/components/responses/StandardError'
+ *       403:
+ *         $ref: '#/components/responses/StandardError'
+ *       404:
+ *         $ref: '#/components/responses/StandardError'
+ */
+taskRoutes.put(
+    '/task/:id',
+    [
+        requireAuth,
+        processRequest({ body: UpdateTaskSchema }),
+    ],
+    taskController.update
 );
 
 export default taskRoutes;

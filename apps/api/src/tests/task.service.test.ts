@@ -67,6 +67,7 @@ describe('TaskService', () => {
                 title: 'New Task',
                 projectId: 'pid',
                 assignedUserId: 'uid',
+                statut: "NOT_STARTED",
                 priority: ProjectPriority.MUST
             });
             await expect(call).rejects.toThrow("L'utilisateur assigné n'est pas membre de ce projet");
@@ -79,6 +80,7 @@ describe('TaskService', () => {
                 title: 'New Task',
                 projectId: 'invalid',
                 assignedUserId: 'uid',
+                statut: "NOT_STARTED",
                 priority: ProjectPriority.MUST
             });
             await expect(call).rejects.toThrow("Le projet n'existe pas");
@@ -99,7 +101,7 @@ describe('TaskService', () => {
 
             const result = await taskService.deleteTask(taskId, userId);
 
-            expect(result.success).toBe(true);
+            expect(result!.success).toBe(true);
             expect(mockTaskRepo.delete).toHaveBeenCalledWith(taskId);
         });
 
@@ -116,7 +118,7 @@ describe('TaskService', () => {
 
             const result = await taskService.deleteTask(taskId, userId);
 
-            expect(result.success).toBe(true);
+            expect(result!.success).toBe(true);
             expect(mockTaskRepo.delete).toHaveBeenCalledWith(taskId);
         });
 
@@ -139,6 +141,60 @@ describe('TaskService', () => {
 
             const call = taskService.deleteTask('invalid', 'any');
             await expect(call).rejects.toThrow("La tâche que vous voulez supprimer n'existe pas");
+        });
+    });
+
+    describe('updateTask', () => {
+        it('should update a task successfully if user is lead', async () => {
+            const taskId = 'tid';
+            const userId = 'lead_id';
+            const updateData = { title: 'Updated' };
+
+            vi.mocked(mockTaskRepo.findById).mockResolvedValue({
+                id: taskId,
+                projectId: 'pid',
+                assignedUserId: 'other_id',
+                project: { leadId: userId }
+            });
+            vi.mocked(mockTaskRepo.update).mockResolvedValue({ id: taskId, ...updateData });
+
+            const result = await taskService.updateTask(taskId, userId, updateData);
+
+            expect(result!.title).toBe('Updated');
+            expect(mockTaskRepo.update).toHaveBeenCalledWith(taskId, updateData);
+        });
+
+        it('should throw 403 if new assigned user is not member of project', async () => {
+            const taskId = 'tid';
+            const userId = 'lead_id';
+            const updateData = { assignedUserId: 'new_uid' };
+
+            vi.mocked(mockTaskRepo.findById).mockResolvedValue({
+                id: taskId,
+                projectId: 'pid',
+                assignedUserId: 'old_uid',
+                project: { leadId: userId }
+            });
+            vi.mocked(mockUserRepo.findById).mockResolvedValue({ id: 'new_uid' });
+            vi.mocked(mockProjectRepo.isMember).mockResolvedValue(false);
+
+            const call = taskService.updateTask(taskId, userId, updateData);
+            await expect(call).rejects.toThrow("Le nouvel utilisateur assigné n'est pas membre de ce projet");
+        });
+
+        it('should throw 403 if user has no permission', async () => {
+            const taskId = 'tid';
+            const userId = 'stranger_id';
+
+            vi.mocked(mockTaskRepo.findById).mockResolvedValue({
+                id: taskId,
+                projectId: 'pid',
+                assignedUserId: 'assigned_id',
+                project: { leadId: 'lead_id' }
+            });
+
+            const call = taskService.updateTask(taskId, userId, { title: 'Hacked' });
+            await expect(call).rejects.toThrow("Vous n'avez pas la permission de modifier cette tâche");
         });
     });
 });

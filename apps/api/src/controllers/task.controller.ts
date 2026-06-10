@@ -22,4 +22,14 @@ export class TaskController {
 
         return res.status(200).json(result);
     }
+
+    update = async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const updatedTask = await this.taskService.updateTask(id as string, req.user.id, req.body);
+
+        return res.status(200).json({
+            success: true,
+            data: updatedTask
+        });
+    }
 }
