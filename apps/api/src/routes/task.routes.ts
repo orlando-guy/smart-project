@@ -1,4 +1,4 @@
-import { TaskSchema, UpdateTaskSchema } from "@repo/shared";
+import { ChangeTaskStatusSchema, TaskSchema, UpdateTaskSchema } from "@repo/shared";
 import { Router } from "express";
 import { TaskController } from "src/controllers/task.controller";
 import { requireAuth } from "src/middlewares/auth.middleware";
@@ -144,6 +144,56 @@ taskRoutes.put(
         processRequest({ body: UpdateTaskSchema }),
     ],
     taskController.update
+);
+
+/**
+ * @openapi
+ * /task/{id}/status:
+ *   patch:
+ *     summary: Change task status
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [statut]
+ *             properties:
+ *               statut: { type: string, enum: [ACHIEVED, ONGOING, NOT_STARTED], example: "ONGOING" }
+ *     responses:
+ *       200:
+ *         description: Status updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { type: object }
+ *       400:
+ *         $ref: '#/components/responses/StandardError'
+ *       401:
+ *         $ref: '#/components/responses/StandardError'
+ *       403:
+ *         $ref: '#/components/responses/StandardError'
+ *       404:
+ *         $ref: '#/components/responses/StandardError'
+ */
+taskRoutes.patch(
+    '/task/:id/status',
+    [
+        requireAuth,
+        processRequest({ body: ChangeTaskStatusSchema }),
+    ],
+    taskController.updateStatus
 );
 
 export default taskRoutes;

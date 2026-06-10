@@ -108,4 +108,9 @@ export class TaskService {
             );
         }
     }
+
+    async updateTaskStatus(taskId: string, userId: string, statut: any) {
+        // La logique de permission est la même que pour updateTask
+        return this.updateTask(taskId, userId, { statut });
+    }
 }

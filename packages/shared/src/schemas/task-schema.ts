@@ -13,5 +13,10 @@ export const TaskSchema = z.object({
 
 export const UpdateTaskSchema = TaskSchema.partial().omit({ projectId: true });
 
+export const ChangeTaskStatusSchema = z.object({
+  statut: z.nativeEnum(TaskStatus)
+});
+
 export type TaskInput = z.infer<typeof TaskSchema>;
 export type UpdateTaskInput = z.infer<typeof UpdateTaskSchema>;
+export type ChangeTaskStatusInput = z.infer<typeof ChangeTaskStatusSchema>;
