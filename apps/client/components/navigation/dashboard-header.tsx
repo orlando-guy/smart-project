@@ -7,7 +7,14 @@ import { Search, CalendarDays, CircleHelp, Bell, Folder } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { useSearchProjects } from '@/features/dashboard-project/application/hooks/useSearchProjects'
+import { useNotifications } from '@/features/notifications/application/hooks/useNotifications'
+import { NotificationList } from '@/features/notifications/presentation/components/NotificationList'
 import { useRouter } from 'next/navigation'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
 
 const DashboardHeader = () => {
   const router = useRouter()
@@ -20,6 +27,9 @@ const DashboardHeader = () => {
     triggerSearch,
     clearSearch,
   } = useSearchProjects()
+
+  const { data: notifications } = useNotifications()
+  const unreadCount = notifications?.filter(n => !n.isRead).length ?? 0
 
   const [showDropdown, setShowDropdown] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
@@ -144,16 +154,26 @@ const DashboardHeader = () => {
             <CircleHelp className="h-4.5 w-4.5" />
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
-            aria-label="Notifications"
-          >
-            <Bell className="h-4.5 w-4.5" />
-            {/* Notification indicator dot */}
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-(--text-danger) ring-2 ring-background" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
+                aria-label="Notifications"
+              >
+                <Bell className="h-4.5 w-4.5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white ring-2 ring-background">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80 p-0" align="end" sideOffset={8}>
+              <NotificationList limit={5} />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
