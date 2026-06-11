@@ -1,3 +1,10 @@
+export const NotificationType = {
+  TASK_ASSIGNED: 'TASK_ASSIGNED',
+  PROJECT_INVITATION: 'PROJECT_INVITATION',
+  PROJECT_CREATED: 'PROJECT_CREATED',
+  TASK_STATUS_CHANGED: 'TASK_STATUS_CHANGED'
+} as const;
+
 export const ProjectPriority = {
     MUST: "MUST",
     SHOULD: "SHOULD",
