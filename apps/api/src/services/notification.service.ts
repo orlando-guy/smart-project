@@ -1,16 +1,18 @@
 import { NotificationInput, NotificationType } from "@repo/shared";
 import { NotificationRepository } from "../repositories/notification.repository";
+import { SocketService } from "./socket.service";
 
 export class NotificationService {
   constructor(
-    private readonly notificationRepository = new NotificationRepository()
+    private readonly notificationRepository = new NotificationRepository(),
+    private readonly socketService = SocketService.getInstance()
   ) {}
 
   async notify(data: NotificationInput) {
     const notification = await this.notificationRepository.create(data);
     
-    // TODO: Déclencher l'envoi via WebSockets ici dans le futur
-    // console.log(`[Notification Service] Envoi en temps réel à l'utilisateur ${data.targetedUserId}`);
+    // Envoi en temps réel via WebSockets
+    this.socketService.emitToUser(data.targetedUserId, 'notification', notification);
     
     return notification;
   }
