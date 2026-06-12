@@ -6,7 +6,7 @@ export default function NotificationsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Toutes les notifications</h1>
         <p className="text-muted-foreground mt-2">
-          Gérez et consultez l'historique de vos notifications.
+          Gérez et consultez l&apos;historique de vos notifications.
         </p>
       </div>
 

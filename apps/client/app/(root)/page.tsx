@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useSyncExternalStore, useEffect, useState } from "react";
+import { useSyncExternalStore, useEffect } from "react";
 import { Navbar } from "@/components/landing/navbar";
 import { Hero } from "@/components/landing/hero";
 import { ProblemSolution } from "@/components/landing/problem-solution";
@@ -20,7 +20,7 @@ export default function Home() {
   const router = useRouter();
 
   const isClient = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  
+
   const isReady = isClient && isHydrated;
 
   // 2. Gestion propre de la redirection

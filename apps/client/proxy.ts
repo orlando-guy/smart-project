@@ -5,7 +5,6 @@ export function proxy(request: NextRequest) {
     // Récupère le cookie d'authentification
     const token = request.cookies.get('auth_token')?.value;
     const { pathname } = request.nextUrl;
-
     // Cas 1 : L'utilisateur tente d'accéder au Dashboard sans être connecté
     if (pathname.startsWith('/dashboard') && !token) {
         // Redirige vers la page de connexion
@@ -23,7 +22,6 @@ export function proxy(request: NextRequest) {
         // Redirige directement ver le dashboard
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
-
     // Laisse passer la requête si aucune condition n'est enfreinte
     return NextResponse.next();
 }
