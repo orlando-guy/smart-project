@@ -22,10 +22,18 @@ export class NotificationService {
   }
 
   async markAsRead(notificationId: string) {
+    /**
+     * Marque une notification spécifique comme lue.
+     * Cette action est irréversible via cet endpoint.
+     */
     return this.notificationRepository.markAsRead(notificationId);
   }
 
   async markAllAsRead(userId: string) {
+    /**
+     * Marque toutes les notifications non lues d'un utilisateur comme lues.
+     * Optimisé via un updateMany dans le repository.
+     */
     return this.notificationRepository.markAllAsRead(userId);
   }
 

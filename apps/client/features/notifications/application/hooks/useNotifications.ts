@@ -1,10 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { notificationRepository } from "../../di/notification.container";
+import { 
+  getNotificationsUseCase, 
+  markNotificationAsReadUseCase, 
+  markAllNotificationsAsReadUseCase 
+} from "../../di/notification.container";
 
 export function useNotifications() {
   return useQuery({
     queryKey: ["notifications"],
-    queryFn: () => notificationRepository.getNotifications(),
+    queryFn: () => getNotificationsUseCase.execute(),
   });
 }
 
@@ -12,9 +16,13 @@ export function useMarkAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => notificationRepository.markAsRead(id),
+    mutationFn: (id: string) => markNotificationAsReadUseCase.execute(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      /**
+       * On force le rafraîchissement des données pour que l'état 'lu' 
+       * soit immédiatement visible sur tous les composants.
+       */
+      queryClient.refetchQueries({ queryKey: ["notifications"] });
     },
   });
 }
@@ -23,9 +31,9 @@ export function useMarkAllAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => notificationRepository.markAllAsRead(),
+    mutationFn: () => markAllNotificationsAsReadUseCase.execute(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.refetchQueries({ queryKey: ["notifications"] });
     },
   });
 }

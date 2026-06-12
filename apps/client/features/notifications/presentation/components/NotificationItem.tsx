@@ -26,15 +26,20 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ notification
   };
 
   return (
-    <div 
-      className={`flex items-start gap-3 p-3 transition-colors hover:bg-accent cursor-pointer ${!notification.isRead ? 'bg-accent/30' : ''}`}
-      onClick={() => !notification.isRead && onMarkAsRead(notification.id)}
+    <button
+      type="button"
+      disabled={notification.isRead}
+      className={`flex items-start gap-3 p-3 transition-colors ${notification.isRead ? '' : 'cursor-pointer hover:bg-accent bg-accent/30'}`}
+      onClick={() => {
+        if (notification.isRead) return;
+        onMarkAsRead(notification.id);
+      }}
     >
       <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background border border-border">
         {getIcon()}
       </div>
       <div className="flex-1 space-y-1">
-        <p className={`text-sm ${!notification.isRead ? 'font-semibold' : 'font-normal'}`}>
+        <p className={`text-sm ${notification.isRead ? 'font-normal' : 'font-semibold'}`}>
           {notification.message}
         </p>
         <p className="text-xs text-muted-foreground">
@@ -44,6 +49,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ notification
       {!notification.isRead && (
         <div className="mt-2 h-2 w-2 rounded-full bg-blue-600" />
       )}
-    </div>
+    </button>
   );
 };

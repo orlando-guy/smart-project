@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export class SocketClient {
   private static instance: SocketClient;
@@ -13,19 +14,31 @@ export class SocketClient {
     return SocketClient.instance;
   }
 
-  connect(userId: string) {
+  connect() {
     if (this.socket?.connected) return;
 
+    const token = useAuthStore.getState().token;
+    if (!token) return null;
+
     const url = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:4000";
-    this.socket = io(url);
+    this.socket = io(url, {
+      transports: ['websocket'],
+      upgrade: false,
+      auth: {
+        token // Envoie le token JWT au serveur
+      }
+    });
 
     this.socket.on("connect", () => {
-      console.log("[Socket] Connecté au serveur");
-      this.socket?.emit("join", userId);
+      // Connexion établie et room rejointe côté serveur
+    });
+
+    this.socket.on("connect_error", (err) => {
+      // Gérer l'erreur de connexion (ex: token expiré pour le websocket)
     });
 
     this.socket.on("disconnect", () => {
-      console.log("[Socket] Déconnecté du serveur");
+      // Nettoyage automatique effectué par socket.io-client
     });
 
     return this.socket;

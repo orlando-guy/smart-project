@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '../../application/hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
@@ -36,7 +38,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ limit, showF
   }
 
   return (
-    <div className="flex flex-col h-full max-h-[500px]">
+    <div className="flex flex-col h-full max-h-125">
       <div className="flex items-center justify-between p-4 border-b bg-background">
         <h3 className="font-semibold text-sm">Notifications</h3>
         {unreadCount > 0 && (

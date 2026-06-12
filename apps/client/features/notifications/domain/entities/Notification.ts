@@ -15,7 +15,7 @@ export class Notification {
       json.id,
       json.type,
       json.message,
-      json.isRead,
+      Boolean(json.isRead),
       new Date(json.createdAt),
       json.targetedUserId
     );
