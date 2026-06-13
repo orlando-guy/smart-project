@@ -18,6 +18,15 @@
  *         id: { type: string, example: "user-123" }
  *         name: { type: string, example: "John Doe" }
  *         email: { type: string, example: "john@example.com" }
+ *     ApiNotification:
+ *       type: object
+ *       properties:
+ *         id: { type: string, example: "notif-789" }
+ *         type: { type: string, enum: [TASK_ASSIGNED, PROJECT_INVITATION, PROJECT_CREATED, TASK_STATUS_CHANGED], example: "TASK_ASSIGNED" }
+ *         message: { type: string, example: "Vous avez été assigné à une nouvelle tâche." }
+ *         isRead: { type: boolean, example: false }
+ *         createdAt: { type: string, format: date-time, example: "2026-06-07T12:00:00Z" }
+ *         targetedUserId: { type: string, example: "user-123" }
  *     ApiError:
  *       type: object
  *       properties:

@@ -3,12 +3,14 @@ import { generateErrorWithStatusCode } from "src/lib/utils";
 import { ProjectRepository } from "src/repositories/project.repository";
 import { TaskRepository } from "src/repositories/task.repository";
 import { UserRepository } from "src/repositories/user.repository";
+import { NotificationService } from "./notification.service";
 
 export class TaskService {
     constructor(
         private readonly taskRepository = new TaskRepository(),
         private readonly projectRepository = new ProjectRepository(),
-        private readonly userRepository = new UserRepository()
+        private readonly userRepository = new UserRepository(),
+        private readonly notificationService = new NotificationService()
     ) {}
 
     async createTask(taskData: TaskInput) {
@@ -32,6 +34,10 @@ export class TaskService {
 
         try {
             const task = await this.taskRepository.create(taskData);
+
+            // Notification d'assignation
+            await this.notificationService.notifyTaskAssigned(taskData.assignedUserId, task.title);
+
             return task;
         } catch (error) {
             generateErrorWithStatusCode(

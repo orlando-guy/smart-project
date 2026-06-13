@@ -86,16 +86,25 @@ model Comment {
 }
 
 model Notification {
-  id             String   @id @unique @default(uuid())
+  id             String           @id @unique @default(uuid())
+  type           NotificationType
   message        String
-  createdAt      DateTime @default(now())
+  isRead         Boolean          @default(false)
+  createdAt      DateTime         @default(now())
   targetedUserId String
-  targetedUser   User     @relation(fields: [targetedUserId], references: [id], onDelete: Cascade)
+  targetedUser   User             @relation(fields: [targetedUserId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  PROJECT_INVITATION
+  PROJECT_CREATED
+  TASK_STATUS_CHANGED
 }
 
 enum ProjectPriority {

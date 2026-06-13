@@ -3,11 +3,13 @@ import { ProjectInput } from "@repo/shared";
 import { generateErrorWithStatusCode } from "src/lib/utils";
 import { ProjectRepository } from "src/repositories/project.repository";
 import { UserRepository } from "src/repositories/user.repository";
+import { NotificationService } from "./notification.service";
 
 export class ProjectService {
     constructor(
         private readonly projectRepository = new ProjectRepository(),
-        private readonly userRepository = new UserRepository()
+        private readonly userRepository = new UserRepository(),
+        private readonly notificationService = new NotificationService()
     ) {}
 
 
@@ -36,6 +38,9 @@ export class ProjectService {
                 ...projectData,
                 authorId
             })
+
+            // Notification de succès
+            await this.notificationService.notifyProjectCreated(authorId, project.titre);
 
             return project;
         } catch (error: any) {
@@ -150,6 +155,10 @@ export class ProjectService {
 
         try {
             const data = await this.projectRepository.addMemberToAProject(projectId, memberId);
+            
+            // Notification d'invitation
+            await this.notificationService.notifyProjectInvitation(memberId, project!.titre);
+            
             return data;
         } catch (error) {
             generateErrorWithStatusCode(
@@ -189,7 +198,7 @@ export class ProjectService {
         const isMember = await this.projectRepository.isMember(projectId, memberId);
         if (!isMember) {
             generateErrorWithStatusCode(
-                'Cet utilisateur n\'est pas membre du projet',
+                'Cet utilisateur est pas membre du projet',
                 404
             );
         }
