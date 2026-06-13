@@ -8,6 +8,10 @@ import { Input } from '@/components/ui/input'
 import { useEditProject } from '../../application/hooks/useEditProject'
 import { Loader } from '@/components/shared/loader'
 import { CopyButton } from '@/components/shared/copy-button'
+import { useProjectMembers } from '../../application/hooks/useProjectMembers'
+import { TeamAvatarGroup } from '../components/TeamAvatarGroup'
+import { InviteMemberModal } from '../components/modals/InviteMemberModal'
+import { useState } from 'react'
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
@@ -21,6 +25,10 @@ const ProjectPresentationDetailView = ({
     isLoading,
     error
   } = useSingleProject(projectId)
+
+  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
     const {
     tempTitle,
@@ -52,7 +60,7 @@ const ProjectPresentationDetailView = ({
 
   return (
     <div className='container px-4 md:px-6'>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
         <div className='relative flex flex-col gap-7'>
           {/* Title + cta - Filtres */}
           <div className='flex items-center gap-5'>
@@ -92,7 +100,7 @@ const ProjectPresentationDetailView = ({
                     <PencilIcon className='w-3.5 h-3.5 text-[#5030E5]' />
                   </button>
                   <CopyButton 
-                    textToCopy={typeof window !== 'undefined' ? window.location.href : ''}
+                    textToCopy={globalThis.window === undefined ? '' : globalThis.window.location.href }
                     defaultIcon={<Link2Icon className='w-3.5 h-3.5 text-[#5030E5]' />}
                     className='w-7.5 h-7.5 bg-[#5030E5]/20 flex items-center justify-center rounded-md cursor-pointer hover:bg-[#5030E5]/30 transition-colors'
                     label="Copier le lien"
@@ -121,7 +129,7 @@ const ProjectPresentationDetailView = ({
               <Button
                 variant="link"
                 className='cursor-pointer'
-                onClick={() => alert('add a new member')} // TODO: Should trigger a modal form to add a new member to the current project
+                onClick={() => setIsInviteModalOpen(true)}
               >
                 <span className='flex items-center gap-2'>
                   <div className='px-[7.5px] py-[4.5px] bg-[#5030E5]/20 rounded-sm'>
@@ -131,12 +139,26 @@ const ProjectPresentationDetailView = ({
                 </span>
               </Button>
             <div>
-              {/* Avatars */}
-              {/* TODO: List the a least 4 team's member avatar and should be clickable. On click display a modal of all team's members */}
+              {isLoadingMembers ? (
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-8 w-8 rounded-full bg-slate-100 animate-pulse border-2 border-background" />
+                  ))}
+                </div>
+              ) : (
+                <TeamAvatarGroup members={members ?? []} />
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <InviteMemberModal 
+        projectId={projectId}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        existingMemberIds={members?.map(m => m.id) ?? []}
+      />
     </div>
   )
 }
