@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useEditProject } from '../../application/hooks/useEditProject'
 import { Loader } from '@/components/shared/loader'
+import { CopyButton } from '@/components/shared/copy-button'
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
@@ -38,7 +39,7 @@ const ProjectPresentationDetailView = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center min-h-[400px]">
+      <div className="flex flex-1 items-center justify-center min-h-100">
         <Loader size="lg" label="Chargement du projet..." />
       </div>
     );
@@ -90,9 +91,12 @@ const ProjectPresentationDetailView = ({
                   >
                     <PencilIcon className='w-3.5 h-3.5 text-[#5030E5]' />
                   </button>
-                  <span className='w-7.5 h-7.5 bg-[#5030E5]/20 flex items-center justify-center rounded-md cursor-pointer hover:bg-[#5030E5]/30 transition-colors'>
-                    <Link2Icon className='w-3.5 h-3.5 text-[#5030E5]' />
-                  </span>
+                  <CopyButton 
+                    textToCopy={typeof window !== 'undefined' ? window.location.href : ''}
+                    defaultIcon={<Link2Icon className='w-3.5 h-3.5 text-[#5030E5]' />}
+                    className='w-7.5 h-7.5 bg-[#5030E5]/20 flex items-center justify-center rounded-md cursor-pointer hover:bg-[#5030E5]/30 transition-colors'
+                    label="Copier le lien"
+                  />
                 </div>
               </>
             )}
