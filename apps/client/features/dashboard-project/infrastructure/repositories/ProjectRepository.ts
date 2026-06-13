@@ -39,7 +39,7 @@ export class ProjectRepository
     }
 
     async create(payload: ProjectInput): Promise<Omit<Project, "lead">> {
-        const result = await api.post<any>('/project/register', payload);
+        const result = await api.post('/project/register', payload);
         const project = result.data?.data ?? result.data?.project ?? result.data;
         
         return new Project(
@@ -49,6 +49,22 @@ export class ProjectRepository
             project.leadId,
             project.createdAt
         )
+    }
+
+    async update(id: string, payload: ProjectInput): Promise<Project> {
+        const result = await api.put(`/project/${id}`, payload);
+        const project = result.data?.data ?? result.data?.project ?? result.data;
+
+        return new Project(
+            project.id,
+            project.titre,
+            project.description,
+            project.leadId,
+            project.createdAt,
+            project.lead,
+            project.teams,
+            project.tasks
+        );
     }
 
     async delete(id: string): Promise<void> {
