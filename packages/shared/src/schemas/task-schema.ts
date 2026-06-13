@@ -5,8 +5,8 @@ export const TaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   endDate: z.string().datetime().optional().nullable(),
-  priority: z.nativeEnum(ProjectPriority).default(ProjectPriority.COULD),
-  statut: z.nativeEnum(TaskStatus).default(TaskStatus.NOT_STARTED),
+  priority: z.nativeEnum(ProjectPriority),
+  statut: z.nativeEnum(TaskStatus),
   projectId: z.string().uuid(),
   assignedUserId: z.string().uuid(),
 });

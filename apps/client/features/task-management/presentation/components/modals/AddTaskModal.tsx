@@ -47,13 +47,17 @@ export const AddTaskModal = ({
   } = useForm<TaskInput>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
+      title: "",
+      description: "",
       projectId,
       statut: TaskStatus.NOT_STARTED,
-      priority: ProjectPriority.COULD
+      priority: ProjectPriority.COULD,
+      assignedUserId: ""
     }
   })
 
   const onSubmit = (data: TaskInput) => {
+    console.log("Creating task with data:", data)
     createTask(data, {
       onSuccess: () => {
         reset()
