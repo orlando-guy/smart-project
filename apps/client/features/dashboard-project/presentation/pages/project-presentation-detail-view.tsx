@@ -60,10 +60,10 @@ const ProjectPresentationDetailView = ({
 
   return (
     <div className='container px-4 md:px-6'>
-      <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
+      <div className='flex flex-col gap-6 md:gap-0 md:flex-row md:items-center md:justify-between'>
         <div className='relative flex flex-col gap-7'>
           {/* Title + cta - Filtres */}
-          <div className='flex items-center gap-5'>
+          <div className='flex flex-col md:flex-row md:items-center gap-5'>
             {isEditing ? (
               <div className="flex items-center gap-2">
                 <Input
@@ -112,7 +112,7 @@ const ProjectPresentationDetailView = ({
 
           <GenericDropdown
             triggerLabel='Filtre'
-            triggerClassName='w-fit text-[#787486] text-base px-6 py-2.5 cursor-pointer'
+            triggerClassName='w-[80dvw] md:w-fit text-[#787486] text-base px-6 py-2.5 cursor-pointer'
             triggerLeftIcon={<FilterIcon className="w-4 h-4" />}
           >
             <GenericDropdown.Group>
@@ -122,9 +122,9 @@ const ProjectPresentationDetailView = ({
             </GenericDropdown.Group>
           </GenericDropdown>
         </div>
-        <div className='ml-auto'>
+        <div className='md:ml-auto'>
           {/* Team - Mode vue */}
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center justify-between gap-3'>
             {/* Team + Invite button */}
               <Button
                 variant="link"
