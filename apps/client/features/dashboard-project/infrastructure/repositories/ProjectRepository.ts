@@ -38,6 +38,15 @@ export class ProjectRepository
         );
     }
 
+    async getMembers(projectId: string): Promise<{ id: string; name: string; email: string }[]> {
+        const result = await api.get(`/project/${projectId}/members`);
+        return result.data?.data ?? result.data;
+    }
+
+    async addMember(projectId: string, memberId: string): Promise<void> {
+        await api.post('/project/add-new-member', { projectId, newMemberId: memberId });
+    }
+
     async create(payload: ProjectInput): Promise<Omit<Project, "lead">> {
         const result = await api.post('/project/register', payload);
         const project = result.data?.data ?? result.data?.project ?? result.data;

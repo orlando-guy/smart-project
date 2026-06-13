@@ -11,6 +11,15 @@ export interface IProjectRepository {
         projectId: string
     ): Promise<Project>
 
+    getMembers(
+        projectId: string
+    ): Promise<{ id: string; name: string; email: string }[]>
+
+    addMember(
+        projectId: string,
+        memberId: string
+    ): Promise<void>
+
     create(
         payload: CreateProjectDto
     ): Promise<Omit<Project, 'lead'>>
