@@ -43,4 +43,14 @@ export class TaskController {
             data: updatedTask
         });
     }
+
+    getProjectTasks = async (req: Request, res: Response) => {
+        const { projectId } = req.params;
+        const tasks = await this.taskService.getProjectTasks(projectId as string);
+
+        return res.status(200).json({
+            success: true,
+            data: tasks
+        });
+    }
 }

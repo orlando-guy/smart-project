@@ -37,6 +37,22 @@ export class TaskRepository {
         });
     }
 
+    async findByProjectId(projectId: string) {
+        return this.#prisma.task.findMany({
+            where: { projectId },
+            include: {
+                assignedUser: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            },
+            orderBy: { endDate: 'asc' }
+        });
+    }
+
     async update(id: string, taskData: Partial<TaskInput>) {
         return this.#prisma.task.update({
             where: { id },

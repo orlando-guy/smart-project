@@ -119,4 +119,20 @@ export class TaskService {
         // La logique de permission est la même que pour updateTask
         return this.updateTask(taskId, userId, { statut });
     }
+
+    async getProjectTasks(projectId: string) {
+        const isProjectExists = await this.projectRepository.findById(projectId);
+        if (!isProjectExists) {
+            generateErrorWithStatusCode("Le projet pour lequel vous rechercher les tâches n'existe pas.", 404);
+        }
+        try {
+            return await this.taskRepository.findByProjectId(projectId);
+        } catch(error) {
+            generateErrorWithStatusCode(
+                "Impossible de trouver les tâches. Une erreur est survenue.",
+                500,
+                error
+            );
+        }
+    }
 }
