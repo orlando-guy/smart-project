@@ -1,192 +1,72 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
+import { useSingleProject } from "../../application/hooks/useSingleProject"
 import {
-  CalendarDaysIcon,
-  ChevronDownIcon,
+  CalendarDays,
+  FileText,
   FilterIcon,
-  GripIcon,
+  Grid2X2,
   Link2Icon,
-  ListIcon,
+  MessageSquare,
+  MoreHorizontal,
   PencilIcon,
   PlusIcon,
-  Share2Icon,
+  Share2,
+  Users,
 } from "lucide-react"
+import { GenericDropdown } from "@/components/dropdown/generic-dropdown"
 import { Button } from "@/components/ui/button"
-import { useSingleProject } from "../../application/hooks/useSingleProject"
-import { ProjectMember, ProjectTask } from "../../domain/entities/Project"
-import { InviteMemberModal } from "../components/modals/invite-member-modal"
-import { ProjectTaskBoard } from "../components/project-task-board"
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
 }
 
+type TaskStatus = "NOT_STARTED" | "ONGOING" | "ACHIEVED"
+type ProjectPriority = "MUST" | "SHOULD" | "COULD" | "WONT"
+
+const columns: {
+  status: TaskStatus
+  title: string
+  color: string
+  line: string
+}[] = [
+  { status: "NOT_STARTED", title: "To Do", color: "bg-[#5030E5]", line: "bg-[#5030E5]" },
+  { status: "ONGOING", title: "On Progress", color: "bg-[#FFA500]", line: "bg-[#FFA500]" },
+  { status: "ACHIEVED", title: "Done", color: "bg-[#8BC48A]", line: "bg-[#8BC48A]" },
+]
+
+const priorityStyle: Record<ProjectPriority, string> = {
+  MUST: "bg-[#FFDADA] text-[#D8727D]",
+  SHOULD: "bg-[#FFEFD7] text-[#D58D49]",
+  COULD: "bg-[#DFA874]/20 text-[#D58D49]",
+  WONT: "bg-[#E6F3EB] text-[#68B266]",
+}
+
 function getInitials(name: string) {
   return name
     .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
+    .map((part) => part[0])
     .join("")
+    .slice(0, 2)
+    .toUpperCase()
 }
 
-function buildPreviewMembers(projectTitle: string): ProjectMember[] {
-  return [
-    {
-      user: {
-        id: "preview-member-1",
-        name: "Alex Morgan",
-        email: "alex@smart-project.local",
-      },
-    },
-    {
-      user: {
-        id: "preview-member-2",
-        name: "Maya Chen",
-        email: "maya@smart-project.local",
-      },
-    },
-    {
-      user: {
-        id: "preview-member-3",
-        name: projectTitle,
-        email: "project@smart-project.local",
-      },
-    },
-    {
-      user: {
-        id: "preview-member-4",
-        name: "Sam Lee",
-        email: "sam@smart-project.local",
-      },
-    },
-  ]
-}
-
-const previewTasks: ProjectTask[] = [
-  {
-    title: "Brainstorming",
-    description: "Brainstorming brings team members' diverse experience into play.",
-    endDate: "2026-06-12",
-    priority: "SHOULD",
-    statut: "NOT_STARTED",
-    assignedUser: {
-      id: "preview-member-1",
-      name: "Alex Morgan",
-    },
-  },
-  {
-    title: "Research",
-    description: "User research helps you to create an optimal product for users.",
-    endDate: "2026-06-13",
-    priority: "MUST",
-    statut: "NOT_STARTED",
-    assignedUser: {
-      id: "preview-member-2",
-      name: "Maya Chen",
-    },
-  },
-  {
-    title: "Wireframes",
-    description: "Low fidelity wireframes include the most basic content and visuals.",
-    endDate: "2026-06-15",
-    priority: "MUST",
-    statut: "NOT_STARTED",
-    assignedUser: {
-      id: "preview-member-3",
-      name: "Sam Lee",
-    },
-  },
-  {
-    title: "Onboarding Illustrations",
-    description: "Create friendly visuals for the first user journey.",
-    endDate: "2026-06-16",
-    priority: "SHOULD",
-    statut: "ONGOING",
-    assignedUser: {
-      id: "preview-member-1",
-      name: "Alex Morgan",
-    },
-  },
-  {
-    title: "Moodboard",
-    description: "Collect UI references and align the visual direction.",
-    endDate: "2026-06-18",
-    priority: "SHOULD",
-    statut: "ONGOING",
-    assignedUser: {
-      id: "preview-member-2",
-      name: "Maya Chen",
-    },
-  },
-  {
-    title: "Mobile App Design",
-    description: "Complete the main screens and prepare them for review.",
-    endDate: "2026-06-20",
-    priority: "COULD",
-    statut: "ACHIEVED",
-    assignedUser: {
-      id: "preview-member-3",
-      name: "Sam Lee",
-    },
-  },
-  {
-    title: "Design System",
-    description: "It just needs to adapt the UI from what you did before.",
-    endDate: "2026-06-21",
-    priority: "COULD",
-    statut: "ACHIEVED",
-    assignedUser: {
-      id: "preview-member-4",
-      name: "Nina Smith",
-    },
-  },
-]
-
-const avatarColors = [
-  "bg-[#F4B55A] text-[#7A4A00]",
-  "bg-[#8BC48A] text-white",
-  "bg-[#76A5EA] text-white",
-  "bg-[#D8727D] text-white",
-]
-
-function AvatarStack({ members }: Readonly<{ members: ProjectMember[] }>) {
-  const visibleMembers = members.slice(0, 4)
-  const overflow = Math.max(members.length - visibleMembers.length, 0)
-
-  return (
-    <div className="flex items-center">
-      <div className="flex -space-x-2">
-        {visibleMembers.map((member, index) => (
-          <span
-            key={member.user.id}
-            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[10px] font-semibold ${avatarColors[index % avatarColors.length]}`}
-            title={member.user.name}
-          >
-            {getInitials(member.user.name)}
-          </span>
-        ))}
-      </div>
-      {overflow > 0 && (
-        <span className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#F4D7DA] text-xs font-medium text-[#D25B68]">
-          +{overflow}
-        </span>
-      )}
-    </div>
-  )
+function getPriorityLabel(priority: ProjectPriority) {
+  if (priority === "MUST") return "High"
+  if (priority === "WONT") return "Completed"
+  return "Low"
 }
 
 const ProjectPresentationDetailView = ({
   projectId,
 }: Readonly<ProjectPresentationDetailViewProps>) => {
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const { results, isLoading, error } = useSingleProject(projectId)
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white px-6 py-10">
-        <p className="text-sm text-[#787486]">Chargement du projet...</p>
+      <div className="px-5 py-8 md:px-9">
+        <p className="text-sm text-[#787486]">Loading...</p>
       </div>
     )
   }
@@ -194,114 +74,205 @@ const ProjectPresentationDetailView = ({
   if (error) {
     console.error(error.message)
     return (
-      <div className="min-h-screen bg-white px-6 py-10">
-        <p className="text-sm text-destructive">{error.message}</p>
+      <div className="px-5 py-8 md:px-9">
+        <p className="text-sm text-red-500">{error.message}</p>
       </div>
     )
   }
 
-  if (!results) {
-    return (
-      <div className="min-h-screen bg-white px-6 py-10">
-        <p className="text-sm text-[#787486]">Projet introuvable.</p>
-      </div>
-    )
-  }
-
-  const apiMembers = results.teams ?? []
-  const apiTasks = results.tasks ?? []
-  const isPreviewMode = apiMembers.length === 0 && apiTasks.length === 0
-  const members = apiMembers.length > 0 ? apiMembers : buildPreviewMembers(results.titre)
-  const tasks = apiTasks.length > 0 ? apiTasks : previewTasks
+  const tasks = results?.tasks ?? []
+  const members = results?.teams?.map((team) => team.user) ?? []
 
   return (
-    <div className="min-h-screen bg-white px-5 py-8 md:px-8">
-      <div className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-        <div className="min-w-0 space-y-3">
+    <div className="min-h-[calc(100vh-68px)] px-5 py-9 md:px-9">
+      <section className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-4">
-            <h1 className="text-3xl font-semibold tracking-normal text-[#0D062D] md:text-[46px] md:leading-[1.05]">
-              {results.titre}
+            <h1 className="max-w-full truncate text-4xl font-bold tracking-normal text-[#0D062D] md:text-[46px]">
+              {results?.titre}
             </h1>
             <div className="flex items-center gap-3">
-              <button className="flex h-8 w-8 items-center justify-center rounded-md bg-[#5030E5]/10 text-[#5030E5]">
+              <button className="flex h-7 w-7 items-center justify-center rounded-md bg-[#5030E5]/10 text-[#5030E5]">
                 <PencilIcon className="h-4 w-4" />
-                <span className="sr-only">Edit project</span>
               </button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-md bg-[#5030E5]/10 text-[#5030E5]">
+              <button className="flex h-7 w-7 items-center justify-center rounded-md bg-[#5030E5]/10 text-[#5030E5]">
                 <Link2Icon className="h-4 w-4" />
-                <span className="sr-only">Copy project link</span>
               </button>
             </div>
           </div>
-          <p className="max-w-3xl text-sm leading-6 text-[#787486]">{results.description}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#787486]">
+            {results?.description}
+          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex flex-wrap items-center gap-3 xl:justify-end">
           <Button
             variant="link"
-            className="h-9 cursor-pointer px-0 text-[#5030E5]"
-            onClick={() => setIsInviteModalOpen(true)}
+            className="h-8 gap-2 px-0 text-[#5030E5]"
+            onClick={() => alert("add a new member")}
           >
-            <span className="flex items-center gap-2 text-sm font-medium">
-              <span className="flex h-4 w-4 items-center justify-center rounded-sm bg-[#5030E5]/10">
-                <PlusIcon className="h-3 w-3" />
-              </span>
-              Invite
+            <span className="flex h-4 w-4 items-center justify-center rounded bg-[#5030E5]/10">
+              <PlusIcon className="h-3 w-3" />
             </span>
+            Invite
           </Button>
-
-          <AvatarStack members={members} />
+          <div className="flex -space-x-2">
+            {members.slice(0, 5).map((member, index) => (
+              <div
+                key={member.id}
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white text-xs font-semibold text-white"
+                style={{
+                  backgroundColor: ["#F9A86E", "#7AC555", "#76A5EA", "#DFA874", "#F3AFC0"][index % 5],
+                }}
+                title={member.name}
+              >
+                {getInitials(member.name)}
+              </div>
+            ))}
+            {members.length > 5 && (
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#F4D7DA] text-xs font-semibold text-[#D25B68]">
+                +{members.length - 5}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" className="h-10 gap-2 rounded-md border-[#787486] bg-white px-4 text-[#787486]">
-            <FilterIcon className="h-4 w-4" />
-            Filter
-            <ChevronDownIcon className="h-4 w-4" />
-          </Button>
+          <GenericDropdown
+            triggerLabel="Filter"
+            triggerClassName="h-10 w-fit border-[#787486]/60 text-[#787486] text-sm px-4 cursor-pointer rounded-md"
+            triggerLeftIcon={<FilterIcon className="h-4 w-4" />}
+          >
+            <GenericDropdown.Group>
+              <GenericDropdown.Item>Date de creation</GenericDropdown.Item>
+              <GenericDropdown.Item>Haute priorite</GenericDropdown.Item>
+              <GenericDropdown.Item>Priorite moyenne</GenericDropdown.Item>
+            </GenericDropdown.Group>
+          </GenericDropdown>
 
-          <Button variant="outline" className="h-10 gap-2 rounded-md border-[#787486] bg-white px-4 text-[#787486]">
-            <CalendarDaysIcon className="h-4 w-4" />
-            Today
-            <ChevronDownIcon className="h-4 w-4" />
-          </Button>
+          <GenericDropdown
+            triggerLabel="Today"
+            triggerClassName="h-10 w-fit border-[#787486]/60 text-[#787486] text-sm px-4 cursor-pointer rounded-md"
+            triggerLeftIcon={<CalendarDays className="h-4 w-4" />}
+          >
+            <GenericDropdown.Group>
+              <GenericDropdown.Item>Aujourd'hui</GenericDropdown.Item>
+              <GenericDropdown.Item>Cette semaine</GenericDropdown.Item>
+              <GenericDropdown.Item>Ce mois</GenericDropdown.Item>
+            </GenericDropdown.Group>
+          </GenericDropdown>
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="outline" className="h-10 gap-2 rounded-md border-[#787486] bg-white px-4 text-[#787486]">
-            <Share2Icon className="h-4 w-4" />
+          <Button variant="outline" className="h-10 gap-2 rounded-md border-[#787486]/60 px-4 text-[#787486]">
+            <Share2 className="h-4 w-4" />
             Share
           </Button>
-          <div className="h-7 w-px bg-[#787486]/40" />
-          <div className="flex items-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-md bg-[#5030E5] text-white">
-              <ListIcon className="h-5 w-5" />
-              <span className="sr-only">List view</span>
-            </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-md text-[#787486] hover:bg-[#F5F5F5]">
-              <GripIcon className="h-5 w-5" />
-              <span className="sr-only">Grid view</span>
-            </button>
+          <span className="h-7 w-px bg-[#787486]/40" />
+          <button className="flex h-10 w-10 items-center justify-center rounded-md bg-[#5030E5] text-white">
+            <Grid2X2 className="h-5 w-5" />
+          </button>
+          <button className="flex h-10 w-10 items-center justify-center rounded-md text-[#787486] hover:bg-[#F5F5F7]">
+            <MoreHorizontal className="h-5 w-5 rotate-90" />
+          </button>
+        </div>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-3">
+        {columns.map((column) => {
+          const columnTasks = tasks.filter((task) => task.statut === column.status)
+
+          return (
+            <div key={column.status} className="min-h-[520px] rounded-2xl bg-[#F5F5F5] p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${column.color}`} />
+                  <h2 className="text-sm font-semibold text-[#0D062D]">{column.title}</h2>
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E0E0E0] px-1.5 text-xs font-medium text-[#625F6D]">
+                    {columnTasks.length}
+                  </span>
+                </div>
+                {column.status === "NOT_STARTED" && (
+                  <button className="flex h-5 w-5 items-center justify-center rounded bg-[#5030E5]/10 text-[#5030E5]">
+                    <PlusIcon className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+              <div className={`mb-5 h-[3px] rounded-full ${column.line}`} />
+
+              <div className="space-y-4">
+                {columnTasks.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-[#DADADA] bg-white/60 px-4 py-8 text-center">
+                    <p className="text-sm font-medium text-[#0D062D]">Aucune tache</p>
+                    <p className="mt-1 text-xs text-[#787486]">Les taches de ce statut apparaitront ici.</p>
+                  </div>
+                ) : (
+                  columnTasks.map((task) => (
+                    <article
+                      key={`${task.title}-${task.assignedUser.id}`}
+                      className="rounded-xl bg-white p-5 shadow-[0_10px_28px_rgba(15,13,43,0.06)]"
+                    >
+                      <div className="mb-2 flex items-start justify-between gap-3">
+                        <span className={`rounded px-2 py-1 text-xs font-medium ${priorityStyle[task.priority]}`}>
+                          {getPriorityLabel(task.priority)}
+                        </span>
+                        <button className="text-[#0D062D]">
+                          <MoreHorizontal className="h-5 w-5" />
+                        </button>
+                      </div>
+                      <h3 className="text-base font-bold text-[#0D062D]">{task.title}</h3>
+                      {task.description && (
+                        <p className="mt-2 line-clamp-2 text-xs leading-5 text-[#787486]">{task.description}</p>
+                      )}
+                      <div className="mt-5 flex items-center justify-between gap-3 text-[11px] text-[#787486]">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F9A86E] text-[10px] font-semibold text-white">
+                          {getInitials(task.assignedUser.name)}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <MessageSquare className="h-3.5 w-3.5" />
+                            0 comments
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FileText className="h-3.5 w-3.5" />
+                            0 files
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </section>
+
+      <section className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-[#DBDBDB] bg-white p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#0D062D]">
+            <Users className="h-4 w-4 text-[#5030E5]" />
+            Members
           </div>
+          <p className="mt-2 text-sm text-[#787486]">{members.length} membre(s) dans ce projet.</p>
         </div>
-      </div>
-
-      {isPreviewMode && (
-        <div className="mb-6 rounded-xl border border-[#5030E5]/15 bg-[#5030E5]/5 px-4 py-3 text-sm text-[#5030E5]">
-          Apercu frontend: l'API ne renvoie pas encore de membres ni de taches pour ce projet.
+        <div className="rounded-2xl border border-[#DBDBDB] bg-white p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#0D062D]">
+            <FileText className="h-4 w-4 text-[#5030E5]" />
+            Documents
+          </div>
+          <p className="mt-2 text-sm text-[#787486]">Interface prete, API documents encore absente.</p>
         </div>
-      )}
-
-      <ProjectTaskBoard tasks={tasks} members={members} />
-
-      <InviteMemberModal
-        open={isInviteModalOpen}
-        onOpenChange={setIsInviteModalOpen}
-        projectId={projectId}
-        members={apiMembers}
-      />
+        <div className="rounded-2xl border border-[#DBDBDB] bg-white p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#0D062D]">
+            <MessageSquare className="h-4 w-4 text-[#5030E5]" />
+            Comments
+          </div>
+          <p className="mt-2 text-sm text-[#787486]">Les commentaires seront branches quand l'API sera disponible.</p>
+        </div>
+      </section>
     </div>
   )
 }

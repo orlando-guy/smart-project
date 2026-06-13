@@ -6,19 +6,19 @@ const DynamicLogo = ({
 }: Readonly<{
   brandName?: string
 }>) => {
-  brandName ??= "Smart Project"
+  brandName ??= "Smart Project "
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="h-12 px-1 text-[#0D062D] hover:bg-transparent data-[state=open]:bg-transparent"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-transparent text-sidebar-primary-foreground">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
             <Image src="/logo-icon.svg" alt="Logo" width={40} height={40} />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{brandName}</span>
+            <span className="truncate text-base font-bold">{brandName}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>

@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Folder,
   Forward,
   MoreHorizontal,
   Trash2,
@@ -44,24 +43,40 @@ export function NavProjects({
   const { isMobile } = useSidebar()
   const router = useRouter()
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null)
+  const colors = ["bg-[#7AC555]", "bg-[#FFA500]", "bg-[#E4CCFD]", "bg-[#76A5EA]"]
 
   return (
     <React.Fragment>
-      <SidebarGroup className="group-data-[collapsible=icon]:block">
-        <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroup className="mt-5 px-0 group-data-[collapsible=icon]:block">
+        <div className="mb-2 flex items-center justify-between px-2">
+          <SidebarGroupLabel className="px-0 text-[11px] font-bold uppercase tracking-normal text-[#787486]">
+            My Projects
+          </SidebarGroupLabel>
+          <button
+            type="button"
+            onClick={() => setIsAddProjectModalOpen(true)}
+            className="flex h-4 w-4 items-center justify-center rounded border border-[#787486]/60 text-[#787486] transition-colors hover:border-[#5030E5] hover:text-[#5030E5]"
+            aria-label="Ajouter un projet"
+          >
+            <PlusIcon className="h-3 w-3" />
+          </button>
+        </div>
         <SidebarMenu>
-          {projects.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild>
+          {projects.map((item, index) => (
+            <SidebarMenuItem key={item.id}>
+              <SidebarMenuButton
+                asChild
+                className="h-10 rounded-md px-2 text-sm font-medium text-[#787486] hover:bg-[#5030E5]/10 hover:text-[#0D062D] data-[active=true]:bg-[#5030E5]/10"
+              >
                 <a href={item.url}>
-                  <item.icon />
-                  <span>{item.name}</span>
+                  <span className={`h-2 w-2 rounded-full ${colors[index % colors.length]}`} />
+                  <span className="truncate">{item.name}</span>
                 </a>
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
+                  <SidebarMenuAction showOnHover className="text-[#0D062D]">
+                    <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">More</span>
                   </SidebarMenuAction>
                 </DropdownMenuTrigger>
@@ -71,7 +86,7 @@ export function NavProjects({
                   align={isMobile ? "end" : "start"}
                 >
                   <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(item.url)}>
-                    <Folder className="text-muted-foreground" />
+                    <item.icon className="text-muted-foreground" />
                     <span>View Project</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
@@ -90,12 +105,12 @@ export function NavProjects({
               </DropdownMenu>
             </SidebarMenuItem>
           ))}
-          <SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
             <SidebarMenuButton
-              className="text-sidebar-foreground/70"
+              className="mt-1 h-9 rounded-md px-2 text-sm text-[#787486] hover:bg-[#F5F5F7] hover:text-[#0D062D]"
               onClick={() => setIsAddProjectModalOpen(true)}
             >
-              <PlusIcon className="text-sidebar-foreground/70" />
+              <PlusIcon className="text-[#787486]" />
               <span>Ajouter un projet</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

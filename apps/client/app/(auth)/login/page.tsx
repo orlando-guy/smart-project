@@ -6,7 +6,7 @@ export default function SingInPage() {
     return (
         <main className="container bg-[#FAFBFC] max-w-screen max-h-screen overflow-hidden">
             <div className="w-full h-full flex items-center justify-center">
-                <Suspense>
+                <Suspense fallback={null}>
                     <LoginForm />
                 </Suspense>
                 <div className="absolute bottom-0 left-0 hidden md:inline-block">

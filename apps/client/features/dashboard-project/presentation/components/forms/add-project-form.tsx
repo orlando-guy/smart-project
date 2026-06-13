@@ -7,8 +7,28 @@ import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from 
 import { useCreateProject } from '@/features/dashboard-project/application/mutations/useCreateProject'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ProjectInput, ProjectSchema } from '@repo/shared'
+import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+
+function getProjectCreationError(error: unknown) {
+    if (axios.isAxiosError(error)) {
+        const data = error.response?.data as {
+            message?: string
+            error?: string
+        } | undefined
+
+        if (data?.message) return data.message
+        if (data?.error) return data.error
+        if (error.response?.status === 401) return "Votre session a expire. Reconnectez-vous puis reessayez."
+        if (error.response?.status === 409) return "Un projet avec ce titre existe deja."
+        if (!error.response) return "Impossible de joindre l'API. Verifiez que le backend est lance."
+    }
+
+    if (error instanceof Error && error.message) return error.message
+
+    return "Une erreur s'est produite lors de la creation de votre projet."
+}
 
 const AddProjectForm = () => {
     const mutation = useCreateProject()
@@ -18,16 +38,19 @@ const AddProjectForm = () => {
             title: "",
             description: ""
         }
-    });
+    })
+
     function onSubmit(data: ProjectInput) {
-        console.log(data);
+        form.clearErrors("root")
         mutation.mutate(data, {
             onSuccess: async () => {
-                toast.success("Votre projet a été créer avec succès !")
+                toast.success("Votre projet a ete cree avec succes !")
                 form.reset()
             },
-            onError: async () => {
-                toast.error("Une érreur s'est produit lors de la création de votre projet.")
+            onError: async (error) => {
+                const message = getProjectCreationError(error)
+                form.setError("root", { message })
+                toast.error(message)
             }
         })
     }
@@ -75,7 +98,7 @@ const AddProjectForm = () => {
                                 <InputGroupTextarea
                                     {...field}
                                     id="register-project-description"
-                                    placeholder="Ce projet vise à développer intégralement l'interface..."
+                                    placeholder="Ce projet vise a developper integralement l'interface..."
                                     rows={6}
                                     className="min-h-24 resize-none"
                                     aria-invalid={fieldState.invalid}
@@ -87,8 +110,8 @@ const AddProjectForm = () => {
                                 </InputGroupAddon>
                             </InputGroup>
                             <FieldDescription>
-                                Soyez le plus précis dans votre description afin de permettre
-                                à vos futurs collaborateur de comprendre les enjeux.
+                                Soyez le plus precis dans votre description afin de permettre
+                                a vos futurs collaborateur de comprendre les enjeux.
                             </FieldDescription>
                             {fieldState.invalid && (
                                 <FieldError errors={[fieldState.error]} />
@@ -98,9 +121,8 @@ const AddProjectForm = () => {
                 />
             </FieldGroup>
 
-            {/* Affichage de l'erreur globale renvoyée par le serveur backend */}
             {form.formState.errors.root && (
-                <p className="text-sm font-medium text-destructive bg-destructive/10 p-3 rounded mt-2">
+                <p className="mt-3 rounded-md bg-destructive/10 p-3 text-sm font-medium text-destructive">
                     {form.formState.errors.root.message}
                 </p>
             )}
@@ -110,15 +132,17 @@ const AddProjectForm = () => {
                     type="button"
                     variant="outline"
                     onClick={() => form.reset()}
+                    disabled={mutation.isPending}
                 >
-                    Réinitialiser
+                    Reinitialiser
                 </Button>
                 <Button
                     type="submit"
                     form="register-project"
                     className='cursor-pointer'
+                    disabled={mutation.isPending}
                 >
-                    Enregistrer
+                    {mutation.isPending ? "Enregistrement..." : "Enregistrer"}
                 </Button>
             </Field>
         </form>
