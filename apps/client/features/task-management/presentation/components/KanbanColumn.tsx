@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { PlusIcon } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
+import { AddTaskModal } from './modals/AddTaskModal'
 
 interface KanbanColumnProps {
   id: string
   title: string
   dividerColor: string
   taskCount: number
+  projectId: string
   children?: React.ReactNode
 }
 
@@ -16,8 +18,10 @@ export const KanbanColumn = ({
   title,
   dividerColor,
   taskCount,
+  projectId,
   children
 }: KanbanColumnProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const { setNodeRef, isOver } = useDroppable({
     id: id,
   })
@@ -44,12 +48,15 @@ export const KanbanColumn = ({
                 {taskCount}
             </span>
         </div>
-        {title === "À faire" && (<button 
+        {id === "NOT_STARTED" && (
+          <button 
+            onClick={() => setIsModalOpen(true)}
             className="p-1 hover:bg-[#5030E5]/10 rounded-md transition-colors text-[#5030E5] cursor-pointer"
             aria-label={`Add task to ${title}`}
-        >
-          <PlusIcon className="w-4 h-4" />
-        </button>)}
+          >
+            <PlusIcon className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Divider */}
@@ -68,6 +75,14 @@ export const KanbanColumn = ({
             </div>
         )}
       </div>
+
+      {id === "NOT_STARTED" && (
+        <AddTaskModal 
+          projectId={projectId}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   )
 }

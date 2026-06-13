@@ -13,4 +13,9 @@ export class TaskRepository implements ITaskRepository {
     const result = await api.patch(`/task/${taskId}/status`, { statut: status });
     return result.data?.data ?? result.data;
   }
+
+  async createTask(payload: TaskInput): Promise<Task> {
+    const result = await api.post('/task/create', payload);
+    return result.data?.data ?? result.data;
+  }
 }

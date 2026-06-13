@@ -65,6 +65,7 @@ export const KanbanBoard = ({
                 title={column.title}
                 dividerColor={column.color}
                 taskCount={columnTasks.length}
+                projectId={projectId}
               >
                 {columnTasks.map((task) => (
                   <KanbanTaskCard key={task.id} task={task} />

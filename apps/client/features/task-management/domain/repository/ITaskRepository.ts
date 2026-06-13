@@ -1,4 +1,5 @@
 import { Task } from "../entities/Task";
+import { TaskInput } from "@repo/shared";
 
 export interface ITaskRepository {
     getProjectTasks(
@@ -6,4 +7,6 @@ export interface ITaskRepository {
     ): Promise<Task[]>
 
     updateTaskStatus(taskId: string, status: string): Promise<Task>;
+
+    createTask(payload: TaskInput): Promise<Task>;
 }
