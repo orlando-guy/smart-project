@@ -7,6 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useEditProject } from '../../application/hooks/useEditProject'
 import { Loader } from '@/components/shared/loader'
+import { CopyButton } from '@/components/shared/copy-button'
+import { useProjectMembers } from '../../application/hooks/useProjectMembers'
+import { TeamAvatarGroup } from '../components/TeamAvatarGroup'
+import { InviteMemberModal } from '../components/modals/InviteMemberModal'
+import { useState } from 'react'
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
@@ -20,6 +25,10 @@ const ProjectPresentationDetailView = ({
     isLoading,
     error
   } = useSingleProject(projectId)
+
+  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
     const {
     tempTitle,
@@ -38,7 +47,7 @@ const ProjectPresentationDetailView = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center min-h-[400px]">
+      <div className="flex flex-1 items-center justify-center min-h-100">
         <Loader size="lg" label="Chargement du projet..." />
       </div>
     );
@@ -51,10 +60,10 @@ const ProjectPresentationDetailView = ({
 
   return (
     <div className='container px-4 md:px-6'>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-col gap-6 md:gap-0 md:flex-row md:items-center md:justify-between'>
         <div className='relative flex flex-col gap-7'>
           {/* Title + cta - Filtres */}
-          <div className='flex items-center gap-5'>
+          <div className='flex flex-col md:flex-row md:items-center gap-5'>
             {isEditing ? (
               <div className="flex items-center gap-2">
                 <Input
@@ -90,9 +99,12 @@ const ProjectPresentationDetailView = ({
                   >
                     <PencilIcon className='w-3.5 h-3.5 text-[#5030E5]' />
                   </button>
-                  <span className='w-7.5 h-7.5 bg-[#5030E5]/20 flex items-center justify-center rounded-md cursor-pointer hover:bg-[#5030E5]/30 transition-colors'>
-                    <Link2Icon className='w-3.5 h-3.5 text-[#5030E5]' />
-                  </span>
+                  <CopyButton 
+                    textToCopy={globalThis.window === undefined ? '' : globalThis.window.location.href }
+                    defaultIcon={<Link2Icon className='w-3.5 h-3.5 text-[#5030E5]' />}
+                    className='w-7.5 h-7.5 bg-[#5030E5]/20 flex items-center justify-center rounded-md cursor-pointer hover:bg-[#5030E5]/30 transition-colors'
+                    label="Copier le lien"
+                  />
                 </div>
               </>
             )}
@@ -100,7 +112,7 @@ const ProjectPresentationDetailView = ({
 
           <GenericDropdown
             triggerLabel='Filtre'
-            triggerClassName='w-fit text-[#787486] text-base px-6 py-2.5 cursor-pointer'
+            triggerClassName='w-[80dvw] md:w-fit text-[#787486] text-base px-6 py-2.5 cursor-pointer'
             triggerLeftIcon={<FilterIcon className="w-4 h-4" />}
           >
             <GenericDropdown.Group>
@@ -110,14 +122,14 @@ const ProjectPresentationDetailView = ({
             </GenericDropdown.Group>
           </GenericDropdown>
         </div>
-        <div className='ml-auto'>
+        <div className='md:ml-auto'>
           {/* Team - Mode vue */}
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center justify-between gap-3'>
             {/* Team + Invite button */}
               <Button
                 variant="link"
                 className='cursor-pointer'
-                onClick={() => alert('add a new member')} // TODO: Should trigger a modal form to add a new member to the current project
+                onClick={() => setIsInviteModalOpen(true)}
               >
                 <span className='flex items-center gap-2'>
                   <div className='px-[7.5px] py-[4.5px] bg-[#5030E5]/20 rounded-sm'>
@@ -127,12 +139,26 @@ const ProjectPresentationDetailView = ({
                 </span>
               </Button>
             <div>
-              {/* Avatars */}
-              {/* TODO: List the a least 4 team's member avatar and should be clickable. On click display a modal of all team's members */}
+              {isLoadingMembers ? (
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-8 w-8 rounded-full bg-slate-100 animate-pulse border-2 border-background" />
+                  ))}
+                </div>
+              ) : (
+                <TeamAvatarGroup members={members ?? []} />
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <InviteMemberModal 
+        projectId={projectId}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        existingMemberIds={members?.map(m => m.id) ?? []}
+      />
     </div>
   )
 }
