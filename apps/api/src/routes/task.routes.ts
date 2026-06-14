@@ -21,7 +21,7 @@ const taskController = new TaskController();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title, projectId, assignedUserId, priority]
+ *             required: [title, projectId, assignedUserIds, priority]
  *             properties:
  *               title: { type: string, example: "Finish API docs" }
  *               description: { type: string, example: "Write down swagger docs for tasks" }
@@ -29,7 +29,7 @@ const taskController = new TaskController();
  *               priority: { type: string, enum: [MUST, SHOULD, COULD, WONT] }
  *               statut: { type: string, enum: [ACHIEVED, ONGOING, NOT_STARTED] }
  *               projectId: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
- *               assignedUserId: { type: string, example: "user-123" }
+ *               assignedUserIds: { type: array, items: { type: string }, example: ["user-123"] }
  *     responses:
  *       201:
  *         description: Task created
@@ -117,7 +117,7 @@ taskRoutes.delete(
  *               endDate: { type: string, format: date-time, example: "2026-06-15T00:00:00Z" }
  *               priority: { type: string, enum: [MUST, SHOULD, COULD, WONT] }
  *               statut: { type: string, enum: [ACHIEVED, ONGOING, NOT_STARTED] }
- *               assignedUserId: { type: string, example: "user-456" }
+ *               assignedUserIds: { type: array, items: { type: string }, example: ["user-456"] }
  *     responses:
  *       200:
  *         description: Task updated

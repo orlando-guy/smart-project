@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/user.repository'
 
 vi.mock('../repositories/project.repository')
 vi.mock('../repositories/user.repository')
+vi.mock('../services/notification.service')
 
 describe('ProjectService -- Add Member', () => {
     let projectService: ProjectService;

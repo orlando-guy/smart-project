@@ -36,10 +36,11 @@ export class ProjectRepository {
                         priority: true,
                         endDate: true,
                         // TODO Also include comment when it will be ready
-                        assignedUser: {
+                        assignedUsers: {
                             select: {
                                 id: true,
-                                name: true
+                                name: true,
+                                email: true
                             }
                         }
                     }
