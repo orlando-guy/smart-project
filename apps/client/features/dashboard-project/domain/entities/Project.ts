@@ -1,5 +1,4 @@
-type ProjectPriority = "MUST" | "SHOULD" | "COULD" | "WONT";
-type TaskStatus = "ACHIEVED" | "ONGOING" | "NOT_STARTED";
+import { Task } from "@/features/task-management/domain/entities/Task";
 
 export class Project {
     constructor(
@@ -18,16 +17,6 @@ export class Project {
                 name: string;
             };
         }[],
-        public tasks?: {
-            description: string | null;
-            title: string;
-            endDate: string | null;
-            priority: ProjectPriority;
-            statut: TaskStatus;
-            assignedUser: {
-                id: string;
-                name: string;
-            };
-        }[]
+        public tasks?: Task[]
     ) { }
 }

@@ -149,3 +149,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 .DS_Store
+packages/database/dev.db

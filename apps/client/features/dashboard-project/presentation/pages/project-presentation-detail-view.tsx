@@ -12,6 +12,7 @@ import { useProjectMembers } from '../../application/hooks/useProjectMembers'
 import { TeamAvatarGroup } from '../components/TeamAvatarGroup'
 import { InviteMemberModal } from '../components/modals/InviteMemberModal'
 import { useState } from 'react'
+import { KanbanBoard } from '@/features/task-management/presentation/components/KanbanBoard'
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
@@ -60,7 +61,7 @@ const ProjectPresentationDetailView = ({
 
   return (
     <div className='container px-4 md:px-6'>
-      <div className='flex flex-col gap-6 md:gap-0 md:flex-row md:items-center md:justify-between'>
+      <div className='flex flex-col gap-6 md:gap-0 md:flex-row md:items-center md:justify-between mb-10'>
         <div className='relative flex flex-col gap-7'>
           {/* Title + cta - Filtres */}
           <div className='flex flex-col md:flex-row md:items-center gap-5'>
@@ -151,6 +152,10 @@ const ProjectPresentationDetailView = ({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className='w-full min-w-0 overflow-hidden'>
+        <KanbanBoard projectId={projectId} />
       </div>
 
       <InviteMemberModal 

@@ -69,7 +69,13 @@ export const InviteMemberModal = ({
           />
         </div>
 
-        <div className="mt-4 max-h-72 overflow-y-scroll pr-2 space-y-2">
+        <div
+          className="mt-4 max-h-72 overflow-y-scroll pr-2 space-y-2"
+          style={{
+            maxHeight: 300,
+            overflowY: "scroll"
+          }}
+        >
           {isLoadingUsers ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-[#5030E5]" />

@@ -196,4 +196,34 @@ taskRoutes.patch(
     taskController.updateStatus
 );
 
+/**
+ * @openapi
+ * /project/{projectId}/tasks:
+ *   get:
+ *     summary: Get all tasks for a specific project
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema: { type: string, example: "550e8400-e29b-41d4-a716-446655440000" }
+ *     responses:
+ *       200:
+ *         description: List of project tasks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { type: array, items: { type: object } }
+ */
+taskRoutes.get(
+    '/project/:projectId/tasks',
+    requireAuth,
+    taskController.getProjectTasks
+);
+
 export default taskRoutes;
