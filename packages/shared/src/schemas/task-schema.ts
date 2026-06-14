@@ -4,7 +4,7 @@ import { ProjectPriority, TaskStatus } from '../constants';
 export const TaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  endDate: z.string().datetime().optional().nullable(),
+  endDate: z.string().date().optional(),
   priority: z.nativeEnum(ProjectPriority),
   statut: z.nativeEnum(TaskStatus),
   projectId: z.string().uuid(),

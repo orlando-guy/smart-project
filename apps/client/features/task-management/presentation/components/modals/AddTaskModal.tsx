@@ -1,13 +1,13 @@
 "use client"
 
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { 
-  TaskSchema, 
-  TaskInput, 
-  ProjectPriority, 
-  TaskStatus 
+import {
+  TaskSchema,
+  TaskInput,
+  ProjectPriority,
+  TaskStatus
 } from '@repo/shared'
 import {
   Dialog,
@@ -19,11 +19,11 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { useProjectMembers } from '@/features/dashboard-project/application/hooks/useProjectMembers'
 import { useCreateTask } from '../../../application/hooks/useCreateTask'
 import { Loader2 } from 'lucide-react'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 
 interface AddTaskModalProps {
   projectId: string
@@ -39,12 +39,7 @@ export const AddTaskModal = ({
   const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
   const { mutate: createTask, isPending } = useCreateTask(projectId)
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<TaskInput>({
+  const form = useForm<TaskInput>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
       title: "",
@@ -52,7 +47,8 @@ export const AddTaskModal = ({
       projectId,
       statut: TaskStatus.NOT_STARTED,
       priority: ProjectPriority.COULD,
-      assignedUserId: ""
+      assignedUserId: "",
+      endDate: new Date().toDateString()
     }
   })
 
@@ -60,7 +56,7 @@ export const AddTaskModal = ({
     console.log("Creating task with data:", data)
     createTask(data, {
       onSuccess: () => {
-        reset()
+        form.reset()
         onClose()
       }
     })
@@ -76,74 +72,141 @@ export const AddTaskModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
+        <form
+          id="create-task"
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 py-4"
+        >
           {/* Titre */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Titre de la tâche</Label>
-            <Input 
-              id="title" 
-              placeholder="Ex: Finaliser le design de l'API" 
-              {...register('title')} 
+          <Controller
+            name='title'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field className='space-y-2'>
+                <FieldLabel htmlFor="title">Titre de la tâche</FieldLabel>
+                <Input
+                  {...field}
+                  type="text"
+                  id="title"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Ex: Finaliser le design de l'API"
+                  className='focus-visible:ring-(--purple)/30'
+                  required
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <FieldGroup className='space-y-2'>
+            <Controller
+              name='description'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel htmlFor='task-description'>
+                    Description (Optionnel)
+                  </FieldLabel>
+                  <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-(--purple)/30'>
+                    <InputGroupTextarea
+                      {...field}
+                      id="task-description"
+                      placeholder="Détail de la tâche..."
+                      rows={6}
+                      className="min-h-24 resize-none"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <InputGroupAddon align="block-end">
+                      <InputGroupText className="tabular-nums">
+                        {field?.value?.length}/100 characters
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  <FieldDescription>
+                    Soyez le plus précis dans votre description afin de permettre
+                    à vos futurs collaborateur de comprendre les enjeux.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-            {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
-          </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optionnel)</Label>
-            <Textarea 
-              id="description" 
-              placeholder="Détails de la tâche..." 
-              className="resize-none"
-              {...register('description')} 
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Priorité */}
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priorité</Label>
-              <select 
-                id="priority"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                {...register('priority')}
-              >
-                <option value={ProjectPriority.MUST}>MUST (Critique)</option>
-                <option value={ProjectPriority.SHOULD}>SHOULD (Important)</option>
-                <option value={ProjectPriority.COULD}>COULD (Souhaitable)</option>
-                <option value={ProjectPriority.WONT}>WONT (Plus tard)</option>
-              </select>
-            </div>
-
-            {/* Date d'échéance */}
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Date d&apos;échéance</Label>
-              <Input 
-                id="endDate" 
-                type="date" 
-                {...register('endDate')} 
+            <div className='grid grid-cols-2 gap-4'>
+              {/* Priorité */}
+              <Controller
+                name='priority'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="task-priority">Priorité</FieldLabel>
+                    <select
+                      {...field}
+                      id="task-priority"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value={ProjectPriority.MUST}>MUST (Critique)</option>
+                      <option value={ProjectPriority.SHOULD}>SHOULD (Important)</option>
+                      <option value={ProjectPriority.COULD}>COULD (Souhaitable)</option>
+                      <option value={ProjectPriority.WONT}>WONT (Plus tard)</option>
+                    </select>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              {/* Date d'échéance */}
+              <Controller
+                name='endDate'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className='space-y-2'>
+                    <FieldLabel htmlFor="task-end-date">Date d&apos;échéance</FieldLabel>
+                    <Input
+                      {...field}
+                      type="date"
+                      id="task-end-date"
+                      aria-invalid={fieldState.invalid}
+                      className='focus-visible:ring-(--purple)/30'
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
             </div>
-          </div>
 
-          {/* Assignation */}
-          <div className="space-y-2">
-            <Label htmlFor="assignedUserId">Assigner à</Label>
-            <select 
-              id="assignedUserId"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              {...register('assignedUserId')}
-            >
-              <option value="">Choisir un membre...</option>
-              {members?.map(member => (
-                <option key={member.id} value={member.id}>
-                  {member.name} ({member.email})
-                </option>
-              ))}
-            </select>
-            {errors.assignedUserId && <p className="text-xs text-red-500">{errors.assignedUserId.message}</p>}
-            {isLoadingMembers && <p className="text-[10px] text-slate-400 animate-pulse">Chargement des membres...</p>}
-          </div>
+            {/* Assignation */}
+            <Controller
+              name='assignedUserId'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel htmlFor="task-priority">Priorité</FieldLabel>
+                  <select
+                    {...field}
+                    id="assignedUserId"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Choisir un membre...</option>
+                    {members?.map(member => (
+                      <option key={member.id} value={member.id}>
+                        {member.name} ({member.email})
+                      </option>
+                    ))}
+                  </select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  {isLoadingMembers && <p className="text-[10px] text-slate-400 animate-pulse">Chargement des membres...</p>}
+                </Field>
+              )}
+            />
+          </FieldGroup>
 
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={onClose}>

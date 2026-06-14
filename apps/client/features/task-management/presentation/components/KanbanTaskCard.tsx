@@ -5,7 +5,7 @@ import { Task } from '../../domain/entities/Task'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { obtainInitials } from '@/lib/utils'
-import { CalendarDays, Flag } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
 
 interface KanbanTaskCardProps {
   task: Task
@@ -78,7 +78,7 @@ export const KanbanTaskCard = ({ task }: KanbanTaskCardProps) => {
           </div>
 
           {task.assignedUser && (
-            <Avatar size="sm" className="border border-white">
+            <Avatar size="default" className="border border-white">
               <AvatarFallback className="bg-slate-100 text-[10px] font-bold">
                 {obtainInitials(task.assignedUser.name)}
               </AvatarFallback>
