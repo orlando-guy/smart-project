@@ -20,6 +20,10 @@ export class TaskRepository implements ITaskRepository {
     return result.data?.data ?? result.data;
   }
 
+  async deleteTask(id: string): Promise<void> {
+    await api.delete(`/task/${id}`);
+  }
+
   async createTask(payload: TaskInput): Promise<Task> {
     const result = await api.post('/task/create', payload);
     return result.data?.data ?? result.data;
