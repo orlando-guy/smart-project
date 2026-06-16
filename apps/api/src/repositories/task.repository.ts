@@ -13,8 +13,19 @@ export class TaskRepository {
                 priority: taskData.priority,
                 statut: taskData.statut,
                 projectId: taskData.projectId,
-                assignedUserId: taskData.assignedUserId,
+                assignedUsers: {
+                    connect: taskData.assignedUserIds.map(id => ({ id }))
+                }
             },
+            include: {
+                assignedUsers: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
         });
     }
 
@@ -25,6 +36,13 @@ export class TaskRepository {
                 project: {
                     select: {
                         leadId: true
+                    }
+                },
+                assignedUsers: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
                     }
                 }
             }
@@ -41,7 +59,7 @@ export class TaskRepository {
         return this.#prisma.task.findMany({
             where: { projectId },
             include: {
-                assignedUser: {
+                assignedUsers: {
                     select: {
                         id: true,
                         name: true,
@@ -62,8 +80,19 @@ export class TaskRepository {
                 endDate: taskData.endDate ? new Date(taskData.endDate) : undefined,
                 priority: taskData.priority,
                 statut: taskData.statut,
-                assignedUserId: taskData.assignedUserId,
+                assignedUsers: taskData.assignedUserIds ? {
+                    set: taskData.assignedUserIds.map(id => ({ id }))
+                } : undefined
             },
+            include: {
+                assignedUsers: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
         });
     }
 }
