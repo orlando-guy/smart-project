@@ -10,5 +10,7 @@ export interface ITaskRepository {
 
     updateTask(id: string, payload: UpdateTaskInput): Promise<Task>;
 
+    deleteTask(id: string): Promise<void>;
+
     createTask(payload: TaskInput): Promise<Task>;
 }
