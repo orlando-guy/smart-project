@@ -3,12 +3,13 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { Task } from '../../domain/entities/Task'
 import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { obtainInitials } from '@/lib/utils'
 import { CalendarDays } from 'lucide-react'
+import { TeamAvatarGroup } from '@/features/dashboard-project/presentation/components/TeamAvatarGroup'
 
 interface KanbanTaskCardProps {
   task: Task
+  onClick?: (task: Task) => void
 }
 
 const priorityColorMap = {
@@ -18,7 +19,7 @@ const priorityColorMap = {
   WONT: 'text-slate-500 bg-slate-50',
 }
 
-export const KanbanTaskCard = ({ task }: KanbanTaskCardProps) => {
+export const KanbanTaskCard = ({ task, onClick }: KanbanTaskCardProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
     data: task
@@ -47,6 +48,7 @@ export const KanbanTaskCard = ({ task }: KanbanTaskCardProps) => {
       {...listeners}
       {...attributes}
       className="cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow border-none bg-white rounded-2xl p-5"
+      onClick={() => onClick?.(task)}
     >
       <CardContent className="flex flex-col gap-4">
         {/* Priority Badge */}
@@ -77,12 +79,10 @@ export const KanbanTaskCard = ({ task }: KanbanTaskCardProps) => {
             )}
           </div>
 
-          {task.assignedUser && (
-            <Avatar size="default" className="border border-white">
-              <AvatarFallback className="bg-slate-100 text-[10px] font-bold">
-                {obtainInitials(task.assignedUser.name)}
-              </AvatarFallback>
-            </Avatar>
+          {task.assignedUsers && task.assignedUsers.length > 0 && (
+            <div onClick={(e) => e.stopPropagation()}>
+                <TeamAvatarGroup members={task.assignedUsers} max={3} />
+            </div>
           )}
         </div>
       </CardContent>

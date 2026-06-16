@@ -1,11 +1,11 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { 
-  TaskSchema, 
-  TaskInput, 
+  UpdateTaskSchema, 
+  UpdateTaskInput, 
   ProjectPriority, 
   TaskStatus 
 } from '@repo/shared'
@@ -20,8 +20,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useProjectMembers } from '@/features/dashboard-project/application/hooks/useProjectMembers'
-import { useCreateTask } from '../../../application/hooks/useCreateTask'
-import { Loader2, Check } from 'lucide-react'
+import { useUpdateTask } from '../../../application/hooks/useUpdateTask'
+import { Loader2, Check, CalendarIcon } from 'lucide-react'
 import { 
   Field, 
   FieldLabel, 
@@ -37,63 +37,90 @@ import {
 } from '@/components/ui/input-group'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { obtainInitials, cn } from '@/lib/utils'
+import { Task } from '../../../domain/entities/Task'
 
-interface AddTaskModalProps {
-  projectId: string
+interface TaskDetailModalProps {
+  task: Task | null
   isOpen: boolean
   onClose: () => void
 }
 
-export const AddTaskModal = ({
-  projectId,
+export const TaskDetailModal = ({
+  task,
   isOpen,
   onClose
-}: AddTaskModalProps) => {
-  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(projectId)
-  const { mutate: createTask, isPending } = useCreateTask(projectId)
+}: TaskDetailModalProps) => {
+  const { data: members, isLoading: isLoadingMembers } = useProjectMembers(task?.projectId ?? "")
+  const { mutate: updateTask, isPending } = useUpdateTask(task?.projectId ?? "")
 
-  const form = useForm<TaskInput>({
-    resolver: zodResolver(TaskSchema),
+  const form = useForm<UpdateTaskInput>({
+    resolver: zodResolver(UpdateTaskSchema),
     defaultValues: {
       title: "",
       description: "",
-      projectId,
       statut: TaskStatus.NOT_STARTED,
       priority: ProjectPriority.COULD,
       assignedUserIds: []
     }
   })
 
-  const onSubmit = (data: TaskInput) => {
-    createTask(data, {
+  // Synchroniser les valeurs du formulaire quand la tâche change
+  useEffect(() => {
+    if (task) {
+      form.reset({
+        title: task.title,
+        description: task.description ?? "",
+        statut: task.statut,
+        priority: task.priority,
+        endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : null,
+        assignedUserIds: task.assignedUsers.map(u => u.id)
+      })
+    }
+  }, [task, form])
+
+  const onSubmit = (data: UpdateTaskInput) => {
+    if (!task) return
+    updateTask({ id: task.id, payload: data }, {
       onSuccess: () => {
-        form.reset()
         onClose()
       }
     })
   }
 
-  const toggleMember = (memberId: string, currentIds: string[]) => {
-    const isSelected = currentIds.includes(memberId)
+  const toggleMember = (memberId: string, currentIds: string[] | undefined) => {
+    const ids = currentIds ?? []
+    const isSelected = ids.includes(memberId)
     if (isSelected) {
-      form.setValue('assignedUserIds', currentIds.filter(id => id !== memberId), { shouldValidate: true })
+      form.setValue('assignedUserIds', ids.filter(id => id !== memberId), { shouldDirty: true, shouldValidate: true })
     } else {
-      form.setValue('assignedUserIds', [...currentIds, memberId], { shouldValidate: true })
+      form.setValue('assignedUserIds', [...ids, memberId], { shouldDirty: true, shouldValidate: true })
     }
   }
+
+  const isDirty = form.formState.isDirty
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une nouvelle tâche</DialogTitle>
+          <div className="flex items-center gap-2 mb-1">
+             <div className={cn(
+                "w-2.5 h-2.5 rounded-full",
+                task?.statut === 'ACHIEVED' ? "bg-[#8BC48A]" : 
+                task?.statut === 'ONGOING' ? "bg-[#FFA500]" : "bg-[#5030E5]"
+             )} />
+             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {task?.statut?.replace('_', ' ')}
+             </span>
+          </div>
+          <DialogTitle>Détails de la tâche</DialogTitle>
           <DialogDescription>
-            Remplissez les détails pour ajouter une tâche à la colonne &quot;À faire&quot;.
+            Consultez ou modifiez les informations de cette tâche.
           </DialogDescription>
         </DialogHeader>
 
         <form
-          id="create-task"
+          id="update-task"
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-6 py-4"
         >
@@ -103,14 +130,13 @@ export const AddTaskModal = ({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field className='space-y-2'>
-                <FieldLabel htmlFor="title">Titre de la tâche</FieldLabel>
+                <FieldLabel htmlFor="edit-title">Titre</FieldLabel>
                 <Input
                   {...field}
                   type="text"
-                  id="title"
+                  id="edit-title"
                   aria-invalid={fieldState.invalid}
-                  placeholder="Ex: Finaliser le design de l'API"
-                  className='focus-visible:ring-[#5030E5]/30'
+                  className='focus-visible:ring-[#5030E5]/30 font-semibold text-lg'
                   required
                 />
                 {fieldState.invalid && (
@@ -126,14 +152,14 @@ export const AddTaskModal = ({
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel htmlFor='task-description'>
-                    Description (Optionnel)
+                  <FieldLabel htmlFor='edit-description'>
+                    Description
                   </FieldLabel>
                   <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-[#5030E5]/30'>
                     <InputGroupTextarea
                       {...field}
-                      id="task-description"
-                      placeholder="Détail de la tâche..."
+                      value={field.value ?? ""}
+                      id="edit-description"
                       rows={4}
                       className="min-h-24 resize-none"
                       aria-invalid={fieldState.invalid}
@@ -144,10 +170,6 @@ export const AddTaskModal = ({
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
-                  <FieldDescription>
-                    Soyez le plus précis dans votre description afin de permettre
-                    à vos futurs collaborateur de comprendre les enjeux.
-                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -162,10 +184,10 @@ export const AddTaskModal = ({
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel htmlFor="task-priority">Priorité</FieldLabel>
+                    <FieldLabel htmlFor="edit-priority">Priorité</FieldLabel>
                     <select
                       {...field}
-                      id="task-priority"
+                      id="edit-priority"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <option value={ProjectPriority.MUST}>MUST (Critique)</option>
@@ -185,12 +207,12 @@ export const AddTaskModal = ({
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field className='space-y-2'>
-                    <FieldLabel htmlFor="task-end-date">Date d&apos;échéance</FieldLabel>
+                    <FieldLabel htmlFor="edit-end-date">Échéance</FieldLabel>
                     <Input
                       {...field}
                       value={field.value ?? ""}
                       type="date"
-                      id="task-end-date"
+                      id="edit-end-date"
                       aria-invalid={fieldState.invalid}
                       className='focus-visible:ring-[#5030E5]/30'
                     />
@@ -202,20 +224,38 @@ export const AddTaskModal = ({
               />
             </div>
 
+            {/* Statut */}
+             <Controller
+                name='statut'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="edit-status">Statut</FieldLabel>
+                    <select
+                      {...field}
+                      id="edit-status"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value={TaskStatus.NOT_STARTED}>À faire</option>
+                      <option value={TaskStatus.ONGOING}>En cours</option>
+                      <option value={TaskStatus.ACHIEVED}>Terminé</option>
+                    </select>
+                  </Field>
+                )}
+              />
+
             {/* Assignation Multiple */}
             <Controller
               name='assignedUserIds'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="space-y-3">
-                  <FieldLabel>Assigner à des membres</FieldLabel>
+                  <FieldLabel>Membres assignés</FieldLabel>
                   <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
                     {members?.map(member => {
-                      const isSelected = field.value.includes(member.id)
+                      const isSelected = field.value?.includes(member.id)
                       return (
-                        <Button
-                          variant="outline"
-                          size="sm"
+                        <div 
                           key={member.id}
                           onClick={() => toggleMember(member.id, field.value)}
                           className={cn(
@@ -232,27 +272,34 @@ export const AddTaskModal = ({
                             <span className="text-xs font-medium truncate">{member.name}</span>
                           </div>
                           {isSelected && <Check className="ml-auto w-3.5 h-3.5 text-[#5030E5]" />}
-                        </Button>
+                        </div>
                       )
                     })}
                   </div>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
                   {isLoadingMembers && <p className="text-[10px] text-slate-400 animate-pulse text-center">Chargement des membres...</p>}
                 </Field>
               )}
             />
           </FieldGroup>
 
+          {/* Squelette Commentaires (Futur) */}
+          <div className="pt-4 border-t border-dashed">
+            <h4 className="text-sm font-semibold mb-3">Commentaires</h4>
+            <p className="text-xs text-muted-foreground italic bg-slate-50 p-3 rounded-lg border">
+              La section commentaires sera bientôt disponible.
+            </p>
+          </div>
+
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={onClose}>
-              Annuler
+              Fermer
             </Button>
-            <Button type="submit" disabled={isPending} className="bg-[#5030E5] hover:bg-[#4020D5]">
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Créer la tâche
-            </Button>
+            {isDirty && (
+              <Button type="submit" disabled={isPending} className="bg-[#5030E5] hover:bg-[#4020D5]">
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Enregistrer les changements
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>
