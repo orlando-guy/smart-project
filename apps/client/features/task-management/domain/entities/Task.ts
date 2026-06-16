@@ -8,10 +8,9 @@ export interface Task {
     id: string;
     title: string;
     description: string | null;
-    endDate: Date | null;
+    endDate: string | null;
     priority: ProjectPriority;
     statut: TaskStatus;
     projectId: string;
-    assignedUserId: string;
-    assignedUser?: User | null
+    assignedUsers: User[];
 }

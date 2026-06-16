@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import { Task } from "../../domain/entities/Task";
 import { ITaskRepository } from "../../domain/repository/ITaskRepository";
+import { TaskInput, UpdateTaskInput } from "@repo/shared";
 
 
 export class TaskRepository implements ITaskRepository {
@@ -11,6 +12,11 @@ export class TaskRepository implements ITaskRepository {
 
   async updateTaskStatus(taskId: string, status: string): Promise<Task> {
     const result = await api.patch(`/task/${taskId}/status`, { statut: status });
+    return result.data?.data ?? result.data;
+  }
+
+  async updateTask(id: string, payload: UpdateTaskInput): Promise<Task> {
+    const result = await api.put(`/task/${id}`, payload);
     return result.data?.data ?? result.data;
   }
 
