@@ -1,8 +1,11 @@
+import React, { useState } from 'react'
 import { KanbanColumn } from './KanbanColumn'
 import { KanbanTaskCard } from './KanbanTaskCard'
 import { useProjectTasks, useUpdateTaskStatus } from '../../application/hooks/useProjectTasks'
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { Loader } from '@/components/shared/loader'
+import { TaskDetailModal } from './modals/TaskDetailModal'
+import { Task } from '../../domain/entities/Task'
 
 interface KanbanBoardProps {
   projectId: string
@@ -19,6 +22,14 @@ export const KanbanBoard = ({
 }: KanbanBoardProps) => {
   const { data: tasks, isLoading } = useProjectTasks(projectId)
   const { mutate: updateStatus } = useUpdateTaskStatus()
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task)
+    setIsDetailModalOpen(true)
+  }
 
   // Configuration des capteurs pour le DND (évite les conflits avec le clic sur bouton)
   const sensors = useSensors(
@@ -68,13 +79,23 @@ export const KanbanBoard = ({
                 projectId={projectId}
               >
                 {columnTasks.map((task) => (
-                  <KanbanTaskCard key={task.id} task={task} />
+                  <KanbanTaskCard 
+                    key={task.id} 
+                    task={task} 
+                    onClick={handleTaskClick}
+                  />
                 ))}
               </KanbanColumn>
             )
           })}
         </div>
       </DndContext>
+
+      <TaskDetailModal 
+        task={selectedTask}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+      />
     </div>
   )
 }

@@ -21,7 +21,7 @@ model User {
   createdAt    DateTime       @default(now())
   project      Project[]
   teams        Team[]
-  tasks        Task[]
+  assignedTasks Task[]        @relation("TaskAssignments")
   documents    Document[]
   comments     Comment[]
   notification Notification[]
@@ -58,8 +58,7 @@ model Task {
   statut         TaskStatus      @default(NOT_STARTED)
   projectId      String
   project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assignedUserId String
-  assignedUser   User            @relation(fields: [assignedUserId], references: [id], onDelete: Cascade)
+  assignedUsers  User[]          @relation("TaskAssignments")
 
   comments Comment[]
 }
