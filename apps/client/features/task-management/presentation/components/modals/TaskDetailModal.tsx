@@ -21,7 +21,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useProjectMembers } from '@/features/dashboard-project/application/hooks/useProjectMembers'
 import { useUpdateTask } from '../../../application/hooks/useUpdateTask'
-import { Loader2, Check, CalendarIcon } from 'lucide-react'
+import { useDeleteTask } from '../../../application/hooks/useDeleteTask'
+import { Loader2, Check, Trash2 } from 'lucide-react'
 import { 
   Field, 
   FieldLabel, 
@@ -52,6 +53,9 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const { data: members, isLoading: isLoadingMembers } = useProjectMembers(task?.projectId ?? "")
   const { mutate: updateTask, isPending } = useUpdateTask(task?.projectId ?? "")
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask(task?.projectId ?? "")
+
+  const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false)
 
   const form = useForm<UpdateTaskInput>({
     resolver: zodResolver(UpdateTaskSchema),
@@ -75,6 +79,7 @@ export const TaskDetailModal = ({
         endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : null,
         assignedUserIds: task.assignedUsers.map(u => u.id)
       })
+      setIsConfirmingDelete(false)
     }
   }, [task, form])
 
@@ -82,6 +87,16 @@ export const TaskDetailModal = ({
     if (!task) return
     updateTask({ id: task.id, payload: data }, {
       onSuccess: () => {
+        onClose()
+      }
+    })
+  }
+
+  const handleDelete = () => {
+    if (!task) return
+    deleteTask(task.id, {
+      onSuccess: () => {
+        setIsConfirmingDelete(false)
         onClose()
       }
     })
@@ -291,15 +306,54 @@ export const TaskDetailModal = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Fermer
-            </Button>
-            {isDirty && (
-              <Button type="submit" disabled={isPending} className="bg-[#5030E5] hover:bg-[#4020D5]">
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Enregistrer les changements
-              </Button>
-            )}
+            <div className="flex w-full items-center justify-between">
+              <div>
+                {isConfirmingDelete ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-red-500">Confirmer ?</span>
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      size="sm" 
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Oui"}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsConfirmingDelete(false)}
+                    >
+                      Non
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onClick={() => setIsConfirmingDelete(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Fermer
+                </Button>
+                {isDirty && (
+                  <Button type="submit" disabled={isPending} className="bg-[#5030E5] hover:bg-[#4020D5]">
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Enregistrer les changements
+                  </Button>
+                )}
+              </div>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
