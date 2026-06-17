@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SmartProject Client
 
-## Getting Started
+Application frontend pour la plateforme de gestion de projets étudiants, développée avec **Next.js 15**, **TypeScript**, et **Shadcn UI**.
 
-First, run the development server:
+## 🏗️ Architecture : Clean Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Ce projet suit une **Clean Architecture** stricte pour garantir la testabilité et la maintenance sur le long terme. Le code est organisé par fonctionnalités dans le dossier `features/`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Structure d'une Feature (`features/<feature-name>/`)
+Chaque fonctionnalité est isolée et contient ses propres couches :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **`domain/`** : Contrat pur (Entités, Interfaces Repository, UseCases). Aucune dépendance externe.
+- **`infrastructure/`** : Implémentation concrète (API Repository appelant Axios/API).
+- **`application/`** : Couche d'orchestration (Hooks React Query/Mutations).
+- **`presentation/`** : UI pure (Pages, Composants, Modals).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🛠️ Tech Stack
+- **Framework** : Next.js 15 (App Router).
+- **Langage** : TypeScript (Strict mode).
+- **Data Fetching** : TanStack Query (React Query).
+- **Formulaires** : React Hook Form + Zod (Validation partagée via `@repo/shared`).
+- **UI** : Tailwind CSS + Shadcn UI.
+- **Drag & Drop** : `@dnd-kit/core` (pour le Kanban).
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+1. **Prérequis** : Node.js 20+, pnpm.
+2. **Installation** : `pnpm install`
+3. **Variables d'environnement** : Copier `.env.example` en `.env` et configurer `NEXT_PUBLIC_API_URL`.
+4. **Lancement** : `pnpm dev`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📘 Guide du Développeur
+- **Ajout d'une fonctionnalité** : Commencez toujours par le schéma Zod dans `@repo/shared`.
+- **Ajout d'API** : Implémentez l'interface dans `domain/repository` puis l'implémentation dans `infrastructure/repositories`.
+- **Tests** : Le projet utilise **Vitest**. Exécutez `pnpm test:run` avant chaque commit.
+- **Convention Commit** : Utilisez les standards Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pour plus de détails, consultez `API_REFERENCE.md` dans ce dossier.
