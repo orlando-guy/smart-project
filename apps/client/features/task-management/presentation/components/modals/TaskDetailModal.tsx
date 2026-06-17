@@ -39,6 +39,8 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { obtainInitials, cn } from '@/lib/utils'
 import { Task } from '../../../domain/entities/Task'
+import { TaskCommentForm } from '../TaskCommentForm'
+import { CommentList } from '../CommentList'
 
 interface TaskDetailModalProps {
   task: Task | null
@@ -297,12 +299,16 @@ export const TaskDetailModal = ({
             />
           </FieldGroup>
 
-          {/* Squelette Commentaires (Futur) */}
+          {/* Commentaires */}
           <div className="pt-4 border-t border-dashed">
             <h4 className="text-sm font-semibold mb-3">Commentaires</h4>
-            <p className="text-xs text-muted-foreground italic bg-slate-50 p-3 rounded-lg border">
-              La section commentaires sera bientôt disponible.
-            </p>
+            {/* Conteneur pour la liste future */}
+            <div className="mb-4">
+               <CommentList taskId={task?.id ?? ""} />
+            </div>
+            
+            {/* Formulaire de création */}
+            <TaskCommentForm taskId={task?.id ?? ""} />
           </div>
 
           <DialogFooter>

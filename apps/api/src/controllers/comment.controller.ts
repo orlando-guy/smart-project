@@ -21,11 +21,12 @@ export class CommentController {
 
     getComments = async (req: Request<{ taskId: string }, {}, {}, PaginationInput>, res: Response) => {
         const { taskId } = req.params;
-        const comments = await this.commentService.getCommentsForTask(taskId, req.query);
-        
+        // Avec notre middleware personnalisé, les données validées sont dans req.validatedQuery
+        const comments = await this.commentService.getCommentsForTask(taskId, (req as any).validatedQuery);
+
         return res.status(200).json({
             success: true,
             ...comments
         });
     }
-}
+    }

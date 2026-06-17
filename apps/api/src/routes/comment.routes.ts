@@ -48,6 +48,16 @@ const commentController = new CommentController();
  *       404:
  *         $ref: '#/components/responses/StandardError'
  */
+const validatePagination = (req: Request, res: Response, next: NextFunction) => {
+    const result = PaginationSchema.safeParse(req.query);
+    if (!result.success) {
+        return res.status(400).json({ success: false, message: "Invalid pagination parameters", errors: result.error });
+    }
+    // On attache les données validées à une propriété personnalisée pour éviter de modifier req.query
+    (req as any).validatedQuery = result.data;
+    next();
+};
+
 commentRoutes.post(
     '/tasks/:taskId/comments',
     [
@@ -61,7 +71,7 @@ commentRoutes.get(
     '/tasks/:taskId/comments',
     [
         requireAuth,
-        processRequest({ query: PaginationSchema }),
+        validatePagination,
     ],
     commentController.getComments
 );
