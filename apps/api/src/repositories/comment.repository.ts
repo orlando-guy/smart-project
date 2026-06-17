@@ -21,4 +21,27 @@ export class CommentRepository {
             }
         });
     }
+
+    async findManyByTaskId(taskId: string, options: { limit: number; skip: number; orderBy: 'asc' | 'desc' }) {
+        return this.#prisma.comment.findMany({
+            where: { taskId },
+            take: options.limit,
+            skip: options.skip,
+            orderBy: { createdAt: options.orderBy },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    }
+
+    async countByTaskId(taskId: string) {
+        return this.#prisma.comment.count({
+            where: { taskId }
+        });
+    }
 }

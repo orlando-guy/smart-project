@@ -1,8 +1,8 @@
-import { CreateCommentSchema } from "@repo/shared";
 import { Router } from "express";
 import { CommentController } from "src/controllers/comment.controller";
 import { requireAuth } from "src/middlewares/auth.middleware";
 import { processRequest } from "zod-express-middleware";
+import { CreateCommentSchema, PaginationSchema } from "@repo/shared";
 
 const commentRoutes: Router = Router();
 const commentController = new CommentController();
@@ -55,6 +55,15 @@ commentRoutes.post(
         processRequest({ body: CreateCommentSchema }),
     ],
     commentController.create
+);
+
+commentRoutes.get(
+    '/tasks/:taskId/comments',
+    [
+        requireAuth,
+        processRequest({ query: PaginationSchema }),
+    ],
+    commentController.getComments
 );
 
 export default commentRoutes;

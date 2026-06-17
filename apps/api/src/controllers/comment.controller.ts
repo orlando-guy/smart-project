@@ -1,4 +1,4 @@
-import { CreateCommentInput } from "@repo/shared";
+import { CreateCommentInput, PaginationInput } from "@repo/shared";
 import { Request, Response } from "express";
 import { CommentService } from "src/services/comment.service";
 
@@ -16,6 +16,16 @@ export class CommentController {
         return res.status(201).json({
             success: true,
             data: comment
+        });
+    }
+
+    getComments = async (req: Request<{ taskId: string }, {}, {}, PaginationInput>, res: Response) => {
+        const { taskId } = req.params;
+        const comments = await this.commentService.getCommentsForTask(taskId, req.query);
+        
+        return res.status(200).json({
+            success: true,
+            ...comments
         });
     }
 }
