@@ -7,7 +7,8 @@ import React, { useState } from "react"
 import { useProjects } from "../../application/hooks/useProjects"
 import ProjectTable from "../components/project-table"
 import { Project } from "../../domain/entities/Project"
-import ProjectTableSkeleton from "../components/skeletons/project-table-skeleton"
+import { Loader } from "@/components/shared/loader"
+import { ErrorDisplay } from "@/components/shared/error-display"
 
 export default function ProjectPresentationView() {
     const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false)
@@ -19,14 +20,21 @@ export default function ProjectPresentationView() {
 
     if (isLoading) {
         return (
-            <div className="container px-4 md:px-6">
-                <ProjectTableSkeleton />
+            <div className="flex flex-1 items-center justify-center min-h-100">
+                <Loader size="lg" label="Chargement du projet..." />
             </div>
-        )
+        );
     }
 
     if (error) {
-        return <p>{error.message}</p>
+        return (
+            <div className="flex flex-1 items-center justify-center min-h-100 px-4">
+                <ErrorDisplay 
+                    message={error.message} 
+                    onRetry={() => globalThis.window.location.reload()} 
+                />
+            </div>
+        )
     }
 
     if (data !== undefined && data.length === 0) {

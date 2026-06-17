@@ -13,6 +13,7 @@ import { TeamAvatarGroup } from '../components/TeamAvatarGroup'
 import { InviteMemberModal } from '../components/modals/InviteMemberModal'
 import { useState } from 'react'
 import { KanbanBoard } from '@/features/task-management/presentation/components/KanbanBoard'
+import { ErrorDisplay } from '@/components/shared/error-display'
 
 interface ProjectPresentationDetailViewProps {
   projectId: string
@@ -55,8 +56,14 @@ const ProjectPresentationDetailView = ({
   }
 
   if (error) {
-    console.error(error.message)
-    return <p>{error.message}</p>
+    return (
+      <div className="flex flex-1 items-center justify-center min-h-100 px-4">
+        <ErrorDisplay 
+          message={error.message} 
+          onRetry={() => globalThis.window.location.reload()} 
+        />
+      </div>
+    )
   }
 
   return (
